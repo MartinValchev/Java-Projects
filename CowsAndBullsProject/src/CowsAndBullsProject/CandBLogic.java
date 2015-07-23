@@ -9,16 +9,14 @@ public class CandBLogic {
 	private boolean isGameEnded;
 	private CheckBulls bulls;
 	private CheckCows cows;
-	private GenerateGuessNumber genNumber;
 	private ValidateCheckInput validateInput;
 	private int cowCounter;
 	private int bullCounter;
 	private static StringBuilder result;
 
 	public CandBLogic(int movesLeft) {
-		genNumber = new GenerateGuessNumber();
 		GenerateGuessNumber.getInstance();
-		guessNumber = genNumber.getGuessNumber();
+		guessNumber = GenerateGuessNumber.generateRandom();
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;
@@ -39,7 +37,6 @@ public class CandBLogic {
 
 	public boolean isGameWon() {
 		if ((bullCounter == 4) && (movesLeft > 0)) {
-			genNumber = null;
 			isGameEnded = true;
 			return true;
 		} else {
@@ -47,9 +44,8 @@ public class CandBLogic {
 		}
 	}
 	public void newGameStarts(int newMovesLeft){
-		genNumber = new GenerateGuessNumber();
-		genNumber.resetNumber();
-		guessNumber = genNumber.getGuessNumber();
+		GenerateGuessNumber.resetNumber();
+		guessNumber = GenerateGuessNumber.getGuessNumber();
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;

@@ -27,7 +27,6 @@ public class CandBMainPanel {
 	static StringBuilder numsLine;
 	static StringBuilder logLine;
 	static int playerMoves;
-	private GenerateGuessNumber genNumber;
 	private int numberToGuess;
 	private ValidateCheckInput checkInput;
 	private CandBLogic logic;
@@ -37,8 +36,7 @@ public class CandBMainPanel {
 		playerMoves = newPlayerMoves;
 		logic = new CandBLogic(playerMoves);
 		digitsCounter = 4;
-		genNumber = new GenerateGuessNumber();
-		numberToGuess = genNumber.getGuessNumber();
+		numberToGuess = GenerateGuessNumber.getGuessNumber();
 		frame = new JFrame("Cows and Bulls Game");
 		frame.setSize(500, 400);
 		frame.setMinimumSize(new Dimension(500, 400));

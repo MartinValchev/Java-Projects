@@ -4,19 +4,18 @@ import java.util.Random;
 
 public class GenerateGuessNumber {
 	static int guessNumber;
-    private static GenerateGuessNumber instance = null;
-    protected GenerateGuessNumber() {
-    	
+    private static final GenerateGuessNumber instance = new GenerateGuessNumber();
+    private GenerateGuessNumber() {
+    	if(instance != null) {
+        	throw new IllegalStateException("Already instantiated");
+        }
      }
      public static GenerateGuessNumber getInstance() {
-        if(instance == null) {
-           instance = new GenerateGuessNumber();
-           guessNumber =  generateRandom();
-        }
+        
         return instance;
      }
 	 
-	private static int generateRandom() {
+	public static int generateRandom() {
 		Random rand = new Random();
 
 		int guessNumber = rand.nextInt(9000) + 1000;
@@ -33,11 +32,10 @@ public class GenerateGuessNumber {
 		}
 		return guessNumber;
 	}
-	public void resetNumber(){
-		instance = null;
-		getInstance();
+	public static void resetNumber(){
+		generateRandom();
 	}
-	public int getGuessNumber(){
+	public static int getGuessNumber(){
 		return guessNumber;
 	}
 }
