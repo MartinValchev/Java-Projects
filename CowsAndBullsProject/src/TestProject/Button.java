@@ -8,9 +8,9 @@ import javax.swing.JComponent;
 public class Button {
 	JButton button;
 	Font buttonFont;
-	String buttonName ="";
+	String buttonName =""
 
-	public Button(String newButtonName) {
+/*	public Button(String newButtonName) {
 		buttonName = newButtonName;
 		button = new JButton(buttonName);
 		GiveFont buttonFont = new GiveFont();
@@ -33,3 +33,4 @@ public class Button {
 	}
 
 }
+*/
