@@ -16,7 +16,7 @@ public class CandBLogic {
 
 	public CandBLogic(int movesLeft) {
 		GenerateGuessNumber.getInstance();
-		guessNumber = GenerateGuessNumber.generateRandom();
+		guessNumber = GenerateGuessNumber.getInstance().generateRandom();
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;
@@ -44,8 +44,8 @@ public class CandBLogic {
 		}
 	}
 	public void newGameStarts(int newMovesLeft){
-		GenerateGuessNumber.resetNumber();
-		guessNumber = GenerateGuessNumber.getGuessNumber();
+		GenerateGuessNumber.getInstance().resetNumber();
+		guessNumber = GenerateGuessNumber.getInstance().getGuessNumber();
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;

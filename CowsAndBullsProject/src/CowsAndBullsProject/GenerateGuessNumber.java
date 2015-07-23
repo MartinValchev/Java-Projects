@@ -15,7 +15,7 @@ public class GenerateGuessNumber {
         return instance;
      }
 	 
-	public static int generateRandom() {
+	public int generateRandom() {
 		Random rand = new Random();
 
 		int guessNumber = rand.nextInt(9000) + 1000;
@@ -32,10 +32,10 @@ public class GenerateGuessNumber {
 		}
 		return guessNumber;
 	}
-	public static void resetNumber(){
+	public void resetNumber(){
 		generateRandom();
 	}
-	public static int getGuessNumber(){
+	public int getGuessNumber(){
 		return guessNumber;
 	}
 }
