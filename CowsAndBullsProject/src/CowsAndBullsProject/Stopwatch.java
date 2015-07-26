@@ -3,8 +3,10 @@ package CowsAndBullsProject;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.Scanner;
-import java.util.Timer;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.Timer; // not java.util.Timer
+import java.text.NumberFormat;
 import java.util.TimerTask;
 
 import javax.swing.JFrame;
@@ -13,11 +15,11 @@ import javax.swing.JTextField;
 
 public class Stopwatch {
 	static int interval;
+	static int range;
 	static Timer timer;
 	static JFrame frame;
 	static JTextField timeField;
 	private static long startTime;
-	private static long currentTime;
 	private static long pauseTime;
 	private static long resumeTime;
 	private static int delay;
@@ -25,8 +27,7 @@ public class Stopwatch {
 
 	public Stopwatch() {
 		startTime = 0;
-		currentTime = 0;
-		delay =1000;
+		delay = 1000;
 		period = 1000;
 	}
 
@@ -35,15 +36,19 @@ public class Stopwatch {
 		frame = new JFrame();
 		frame.setSize(100, 200);
 		timeField = new JTextField(5);
+		delay = 1000;
+		period = 1000;
 		frame.add(timeField);
 		frame.setVisible(true);
-		timer = new Timer();
+		timer = new 
 		interval = Integer.parseInt(secs);
+		range = interval;
 		timeField.setText(secs);
-		timer.scheduleAtFixedRate(new TimerTask() {
-
+		startTime = System.currentTimeMillis();
+		timer..scheduleAtFixedRate(new TimerTask() {
+			
 			public void run() {
-				startTime = System.currentTimeMillis();
+				
 				timeField.setText(Integer.toString(setInterval()));
 
 			}
@@ -58,16 +63,16 @@ public class Stopwatch {
 		return --interval;
 	}
 
-	public static void pause() throws InterruptedException {
+	public static void pause() {
 		pauseTime = System.currentTimeMillis();
-		resumeTime = (currentTime - startTime) / 1000;
-		timer.wait();
+		resumeTime = (pauseTime - startTime);
 		timeField.setText("Pause");
+		
 	}
 
 	public static void resume() {
 		// start from the pause moment;
-		int secondsRemaining = interval - ((int) resumeTime);
+		int secondsRemaining = (int)((range*1000 -  resumeTime)/1000);
 		interval = secondsRemaining;
 		timer.scheduleAtFixedRate(new TimerTask() {
 
@@ -113,12 +118,7 @@ class Listener implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		try {
-			Stopwatch.pause();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Stopwatch.pause();
 
 	}
 
