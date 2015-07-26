@@ -12,31 +12,19 @@ import javax.swing.JTextField;
 
 public class ButtonsConsole implements Console {
 	private static final int NUM_QUANTITY =9;
-	private JTextField guessWidget;
-	private JTextField movesWidget;
-	private JTextField digLeftWidget;
 	private JPanel console;
 	private List<JButton> consoleButtons;
 	private GiveLayout consLayout;
 	private String consoleName;
-	private static ButtonsConsole instance;
 	private StringBuilder numsLine;
 	private static final int GUESS_DIGITS = 4;
   
-	    public static ButtonsConsole getInstance() {
-        if(instance == null) {
-           instance = new ButtonsConsole();
-  
-        }
-        return instance;
-     }
-
-	protected ButtonsConsole() {
+	public ButtonsConsole(String consoleName) {
 		console = new JPanel();
-		setName("ButtonsConsole");
+		setName(consoleName);
 		consoleButtons = new ArrayList();
 		GiveLayout buttonConsLayout = new GiveLayout();
-		buttonConsLayout.setLayout(this);
+		buttonConsLayout.setLayout(console);
 		createButtons();
 		addButtons();
 	}
@@ -80,7 +68,7 @@ public class ButtonsConsole implements Console {
 		return consoleName;
 	}
 	public void setName(String newName){
-		consoleName = newName;
+		console.setName(newName);
 	}
 
 }

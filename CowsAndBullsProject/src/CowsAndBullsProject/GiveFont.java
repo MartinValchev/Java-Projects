@@ -32,6 +32,12 @@ public class GiveFont {
 		if (compName.equals("welcome")) {
 			font = new Font("verdana", Font.BOLD, 12);
 		}
+		if (compName.equals("TimeField")) {
+			font = new Font("Arial", Font.PLAIN, 14);
+		}
+		if (compName.equals("PauseButton")) {
+			font = new Font("verdana", Font.BOLD, 14);
+		}
 		comp.setFont(font);
 	}
 

@@ -8,8 +8,9 @@ public class CandBGamePlay {
 		//choose difficutly
 		DifficultySelection diffSelect = new DifficultySelection();
 		int playerMoves = diffSelect.getPlayerMoves();
+		String gameSeconds = diffSelect.getGameSeconds();
 		// draw the mainScreen
-		CandBMainPanel mainPanel = new CandBMainPanel(playerMoves);
+		CandBMainPanel mainPanel = new CandBMainPanel(playerMoves,gameSeconds);
 	}
 //Game starts 
 	// show welcome message

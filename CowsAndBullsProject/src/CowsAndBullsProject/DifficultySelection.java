@@ -24,6 +24,19 @@ public class DifficultySelection {
 			return 15;
 		}
 	}
+	public String getGameSeconds(){
+		String gameSeconds ="";
+		if (playerMoves ==25){
+			gameSeconds ="600"; // 10 min
+		}
+		else if(playerMoves ==20){
+			gameSeconds ="420"; // 7 min
+		}
+		else if(playerMoves ==15){
+			gameSeconds ="300"; // 5 min
+		}
+		return gameSeconds;
+	}
 
 	public int getPlayerMoves() {
 		return playerMoves;

@@ -1,5 +1,6 @@
 package CowsAndBullsProject;
 
+import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,14 +12,13 @@ import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
 public class TimeCounter implements ActionListener, MouseListener {
-	private int interval;
-	private int range;
 	private Timer timer;
-	private JFrame frame;
+	private Container timeCont;
 	private JTextField timeField;
 	private long now;
 	private long elapsed;
@@ -27,16 +27,24 @@ public class TimeCounter implements ActionListener, MouseListener {
 	private int timerSeconds;
 	private int delay;
 	private int period;
+	private GiveWidgetsLayout layout;
+	private GiveFont font;
 	private JButton pauseButton;
 
 	public TimeCounter(String newSeconds) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(300, 200);
-		frame.setLayout(new FlowLayout());
+		timeCont = new Container();
+		timeCont.setName("TimePanel");
+		//timeCont.setSize(300, 200);
 		timeField = new JTextField();
-		timeField.setColumns(5);
+		layout = new GiveWidgetsLayout();
+		layout.setTimerOrientation(timeCont);
+		timeField.setName("TimeField");
+		timeField.setColumns(8);
+		font = new GiveFont();
+		font.setFont(timeField);
 		pauseButton = new JButton("Pause");
+		pauseButton.setName("PauseButton");
+		font.setFont(pauseButton);
 		timerSeconds = Integer.parseInt(newSeconds);
 		delay = 1000;
 		period = 1000;
@@ -65,15 +73,13 @@ public class TimeCounter implements ActionListener, MouseListener {
 			}
 			
 		});
-		frame.add(timeField);
-		frame.add(pauseButton);
-		frame.setVisible(true);
+		timeCont.add(timeField);
+		timeCont.add(pauseButton);
+		timeCont.setVisible(true);
 	}
-
-	public static void main(String[] args) {
-		TimeCounter timeCount = new TimeCounter("27");
+	public Container getTimeCont(){
+		return timeCont;
 	}
-
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		update();

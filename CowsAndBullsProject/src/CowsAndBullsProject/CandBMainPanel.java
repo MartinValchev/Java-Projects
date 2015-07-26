@@ -1,5 +1,6 @@
 package CowsAndBullsProject;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -21,32 +22,37 @@ public class CandBMainPanel {
 	static JTextField movesTextField;
 	static JTextField digitTextField;
 	static JTextArea logArea;
+	static TimeCounter timeCounter;
 	private static final int NUM_QUANTITY = 10;
 	private static final int GUESS_DIGITS = 4;
 	static int digitsCounter;
 	static StringBuilder numsLine;
 	static StringBuilder logLine;
 	static int playerMoves;
+	private String gameSeconds;
 	private int numberToGuess;
 	private ValidateCheckInput checkInput;
 	private CandBLogic logic;
 	private JFrame frame;
 
-	public CandBMainPanel(int newPlayerMoves) {
+	public CandBMainPanel(int newPlayerMoves, String newGameSeconds) {
 		playerMoves = newPlayerMoves;
+		gameSeconds = newGameSeconds; 
 		logic = new CandBLogic(playerMoves);
 		digitsCounter = 4;
 		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber();
 		frame = new JFrame("Cows and Bulls Game");
-		frame.setSize(500, 400);
-		frame.setMinimumSize(new Dimension(500, 400));
+		frame.setSize(600, 400);
+		frame.setMinimumSize(new Dimension(600, 400));
 		frame.setLocation(50, 50);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// frame.setLayout(new FlowLayout());
 		MainConsole mainConsole = new MainConsole("MainConsole");
 		InfoConsole infoConsole = new InfoConsole("InfoConsole");
-		buttonsConsole = new ButtonsConsole();
+		timeCounter = new TimeCounter(gameSeconds);
+		infoConsole.addTimeCounter(timeCounter.getTimeCont());
 		LogConsole logConsole = new LogConsole("LogConsole");
+		buttonsConsole = new ButtonsConsole("ButtonsConsole");
 		logArea = logConsole.getLogArea();
 		guessTextField = infoConsole.getSpecificField("GuessTextField");
 		movesTextField = infoConsole.getSpecificField("MovesTextField");
@@ -55,10 +61,15 @@ public class CandBMainPanel {
 		digitTextField.setText(Integer.toString(digitsCounter));
 		movesTextField.setText(Integer.toString(playerMoves));
 		addActionButton();
+		/*
 		mainConsole.addPanels(infoConsole);
 		mainConsole.addPanels(buttonsConsole);
 		mainConsole.addPanels(logConsole);
-		mainConsole.getConsole();
+		*/
+		//just for test
+		(mainConsole.getConsole()).add(infoConsole.getConsole(),BorderLayout.NORTH);
+		(mainConsole.getConsole()).add(buttonsConsole.getConsole(),BorderLayout.CENTER);
+		(mainConsole.getConsole()).add(logConsole.getConsole(),BorderLayout.EAST);
 		frame.add(mainConsole.getConsole());
 		frame.setVisible(true);
 

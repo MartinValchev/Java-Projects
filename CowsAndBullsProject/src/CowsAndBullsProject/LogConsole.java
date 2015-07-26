@@ -10,8 +10,9 @@ public class LogConsole implements Console {
 	public LogConsole(String newName) {
 		logConsole = new JPanel();
 		consoleName = newName;
+		setName(consoleName);
 		GiveLayout logConsLayout = new GiveLayout();
-		logConsLayout.setLayout(this);
+		logConsLayout.setLayout(logConsole);
 		textArea =new JTextArea("Guess Log  \n", 15, 12);
 		textArea.setName("textArea");
 		GiveFont logFont = new GiveFont();
@@ -29,6 +30,9 @@ public class LogConsole implements Console {
 	@Override
 	public String getName(){
 		return consoleName;
+	}
+	public void setName(String name){
+		logConsole.setName(name);
 	}
 
 }

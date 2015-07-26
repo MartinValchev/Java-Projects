@@ -22,19 +22,11 @@ public class InfoConsoleWidgets {
 	private Container guessCont;
 	private Container digitsCont;
 	private Container movesCont;
-	GiveFont font;
-	StringBuilder numsLine;
+	private GiveFont font;
+	private StringBuilder numsLine;
 	private int digitsCounter;
-	private static InfoConsoleWidgets instance;
-	  
-    public static InfoConsoleWidgets getInstance() {
-    if(instance == null) {
-       instance = new InfoConsoleWidgets();
 
-    }
-    return instance;
- }
-	protected InfoConsoleWidgets() {
+	public InfoConsoleWidgets() {
 		font = new GiveFont();
 		setContainers();
 		setWidgets();
@@ -42,6 +34,7 @@ public class InfoConsoleWidgets {
 		digitsCont.add(digitsLeft);
 		digitsCont.add(digitsLeftLabel);
 		movesCont.add(movesLeft);
+		
 		layout = new GiveWidgetsLayout();
 		numsLine = new StringBuilder();
 		setDigitsCounter(4);
@@ -68,7 +61,7 @@ public class InfoConsoleWidgets {
 		digitsLeftLabel = new JLabel("Digits Left");
 		digitsLeftLabel.setName("digitsLeftLabel");
 		movesLeftLabel = new JLabel("moves Left");
-		movesLeft = new JTextField(4);
+		movesLeft = new JTextField(3);
 		movesLeft.setName("MovesTextField");
 		movesLeftLabel.setName("movesLeftLabel");
 		movesLeft.setEditable(false);

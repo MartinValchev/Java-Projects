@@ -25,7 +25,8 @@ public class TestCowsAndBulls {
 		WelcomeMessage message = new WelcomeMessage();
 		DifficultySelection select = new DifficultySelection();
 		int playerMoves = select.getPlayerMoves();
-	CandBMainPanel panel = new CandBMainPanel(playerMoves);
+		String gameSeconds = select.getGameSeconds();
+	CandBMainPanel panel = new CandBMainPanel(playerMoves, gameSeconds);
 	}
 
 }

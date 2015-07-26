@@ -11,17 +11,18 @@ public class MainConsole implements Console{
 	GiveLayout mainConsLayout;
 	String consoleName;
 	public MainConsole(String newName) {
+		mainPanel = new JPanel();
 		consoleName = newName;
+		setName(consoleName);
 		//frame = new JFrame();
 		//frame.setMinimumSize(new Dimension(500,400));
-		mainPanel = new JPanel();
 		mainConsLayout = new GiveLayout();
-		mainConsLayout.setLayout(this);
+		mainConsLayout.setLayout(mainPanel);
 		mainPanel.setLocation(50, 50);
 		mainPanel.setVisible(true);
 	}
 	public void addPanels(Console addCons){
-		String orientation = mainConsLayout.setMainOrientation(addCons);
+		String orientation = "BorderLayout." + mainConsLayout.setMainOrientation(addCons);
 		mainPanel.add(addCons.getConsole(),orientation);
 	}
 	@Override
@@ -32,6 +33,9 @@ public class MainConsole implements Console{
 	@Override
 	public String getName(){
 		return consoleName;
+	}
+	public void setName(String newName){
+		mainPanel.setName(newName);
 	}
 
 }

@@ -15,7 +15,7 @@ public class GiveLayout {
 
 	LayoutManager compLayout;
 
-	public void setLayout(Console console) {
+	public void setLayout(JPanel console) {
 		String panelName = console.getName();
 		if (panelName.equals("ButtonsConsole")) {
 			compLayout = new GridLayout(4, 3);
@@ -26,7 +26,7 @@ public class GiveLayout {
 		} else if (panelName.equals("LogConsole")) {
 			compLayout = new FlowLayout();
 		}
-		(console.getConsole()).setLayout(compLayout);
+		console.setLayout(compLayout);
 	}
 
 	// give orientation to the Consoles when they will be added to the Main
@@ -34,11 +34,11 @@ public class GiveLayout {
 	public String setMainOrientation(Console addCons) {
 		String consName = addCons.getName();
 		if (consName.equals("InfoConsole")) {
-			return BorderLayout.NORTH;
+			return "BorderLayout.NORTH";
 		} else if (consName.equals("ButtonsConsole")) {
-			return BorderLayout.CENTER;
+			return "BorderLayout.CENTER";
 		} else if (consName.equals("LogConsole")) {
-			return BorderLayout.EAST;
+			return "BorderLayout.EAST";
 		}
 		return null;
 	}
