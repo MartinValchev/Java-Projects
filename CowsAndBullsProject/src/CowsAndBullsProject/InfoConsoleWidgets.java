@@ -1,5 +1,6 @@
 package CowsAndBullsProject;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -51,7 +52,7 @@ public class InfoConsoleWidgets {
 		guessDisplay.setName("GuessTextField");
 		guessDisplay.setSize(5, 3);
 		guessDisplay.setColumns(5);
-
+		guessDisplay.setBackground(Color.WHITE);
 		font.setFont(guessDisplay);
 		guessDisplay.setEditable(false);
 		digitsLeft = new JTextField(2);

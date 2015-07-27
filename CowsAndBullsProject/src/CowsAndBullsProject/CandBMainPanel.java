@@ -60,18 +60,18 @@ public class CandBMainPanel {
 		numsLine = new StringBuilder();
 		digitTextField.setText(Integer.toString(digitsCounter));
 		movesTextField.setText(Integer.toString(playerMoves));
-		addActionButton();
-		/*
+		
+		addActionButton();/*
 		mainConsole.addPanels(infoConsole);
 		mainConsole.addPanels(buttonsConsole);
-		mainConsole.addPanels(logConsole);
-		*/
+		mainConsole.addPanels(logConsole); */
 		//just for test
+		
 		(mainConsole.getConsole()).add(infoConsole.getConsole(),BorderLayout.NORTH);
 		(mainConsole.getConsole()).add(buttonsConsole.getConsole(),BorderLayout.CENTER);
 		(mainConsole.getConsole()).add(logConsole.getConsole(),BorderLayout.EAST);
 		frame.add(mainConsole.getConsole());
-		frame.setVisible(true);
+		frame.setVisible(true); 
 
 	}
 	public void anotherGame(){
