@@ -30,6 +30,7 @@ public class TimeCounter implements ActionListener, MouseListener {
 	private GiveWidgetsLayout layout;
 	private GiveFont font;
 	private JButton pauseButton;
+	private String status;
 
 	public TimeCounter(String newSeconds) {
 		timeCont = new Container();
@@ -55,6 +56,7 @@ public class TimeCounter implements ActionListener, MouseListener {
 		timeField.addMouseListener(this);
 		timer = new Timer(period, this);
 		timer.setInitialDelay(delay);
+		status  = "Running";
 		timer.start();
 		pauseButton.addActionListener(new ActionListener(){
 
@@ -101,6 +103,7 @@ public class TimeCounter implements ActionListener, MouseListener {
 		}
 		if (remaining == 0) {
 			timer.stop();
+			status  = "Paused";
 		}
 	}
 
@@ -108,14 +111,26 @@ public class TimeCounter implements ActionListener, MouseListener {
 		now = System.currentTimeMillis();
 		remaining -= (now - lastUpdate);
 		timeField.setText("Pause");
+		status  = "Paused";
 		timer.stop();
 	}
 
 	public void resumeTimer() {
 		lastUpdate = System.currentTimeMillis();
 		timer.start();
+		status  = "Running";
 	}
 
+	public int getSecondsRemaining(){
+		int secondsRemain = (int)(remaining/1000);
+		return secondsRemain;
+	}
+	public JTextField getTimeField(){
+		return timeField;
+	}
+	public JButton getPauseButton(){
+		return pauseButton;
+	}
 	/*
 	 * private static final int setInterval() { if (interval == 1) timer return
 	 * --interval; }
@@ -130,12 +145,13 @@ public class TimeCounter implements ActionListener, MouseListener {
 	public void mouseEntered(MouseEvent arg0) {
 		timeField.setText("Paused");
 		pauseTimer();
+		status  = "Paused";
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		resumeTimer();
-
+		status  = "Running";
 	}
 
 	@Override
@@ -149,4 +165,8 @@ public class TimeCounter implements ActionListener, MouseListener {
 		// TODO Auto-generated method stub
 
 	}
+	public String getStatus(){
+		return this.status;
+	}
+	
 }

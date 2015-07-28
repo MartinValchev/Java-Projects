@@ -23,6 +23,7 @@ public class CandBMainPanel {
 	static JTextField digitTextField;
 	static JTextArea logArea;
 	static TimeCounter timeCounter;
+	static int secondsRemaining;
 	private static final int NUM_QUANTITY = 10;
 	private static final int GUESS_DIGITS = 4;
 	static int digitsCounter;
@@ -37,8 +38,7 @@ public class CandBMainPanel {
 
 	public CandBMainPanel(int newPlayerMoves, String newGameSeconds) {
 		playerMoves = newPlayerMoves;
-		gameSeconds = newGameSeconds; 
-		logic = new CandBLogic(playerMoves);
+		gameSeconds = newGameSeconds;
 		digitsCounter = 4;
 		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber();
 		frame = new JFrame("Cows and Bulls Game");
@@ -51,6 +51,8 @@ public class CandBMainPanel {
 		InfoConsole infoConsole = new InfoConsole("InfoConsole");
 		timeCounter = new TimeCounter(gameSeconds);
 		infoConsole.addTimeCounter(timeCounter.getTimeCont());
+		secondsRemaining = timeCounter.getSecondsRemaining();
+		logic = new CandBLogic(playerMoves);
 		LogConsole logConsole = new LogConsole("LogConsole");
 		buttonsConsole = new ButtonsConsole("ButtonsConsole");
 		logArea = logConsole.getLogArea();
@@ -60,85 +62,95 @@ public class CandBMainPanel {
 		numsLine = new StringBuilder();
 		digitTextField.setText(Integer.toString(digitsCounter));
 		movesTextField.setText(Integer.toString(playerMoves));
-		
+
 		addActionButton();/*
-		mainConsole.addPanels(infoConsole);
-		mainConsole.addPanels(buttonsConsole);
-		mainConsole.addPanels(logConsole); */
-		//just for test
-		
-		(mainConsole.getConsole()).add(infoConsole.getConsole(),BorderLayout.NORTH);
-		(mainConsole.getConsole()).add(buttonsConsole.getConsole(),BorderLayout.CENTER);
-		(mainConsole.getConsole()).add(logConsole.getConsole(),BorderLayout.EAST);
+						 * mainConsole.addPanels(infoConsole);
+						 * mainConsole.addPanels(buttonsConsole);
+						 * mainConsole.addPanels(logConsole);
+						 */
+		// just for test
+
+		(mainConsole.getConsole()).add(infoConsole.getConsole(),
+				BorderLayout.NORTH);
+		(mainConsole.getConsole()).add(buttonsConsole.getConsole(),
+				BorderLayout.CENTER);
+		(mainConsole.getConsole()).add(logConsole.getConsole(),
+				BorderLayout.EAST);
 		frame.add(mainConsole.getConsole());
-		frame.setVisible(true); 
+		frame.setVisible(true);
 
 	}
-	public void anotherGame(){
+
+	public void anotherGame() {
+		/////////////// set seconds remaining to the Time field;
 		String title = "New Game request";
 		String message = "Do you want another game?";
-		int choice = JOptionPane.showConfirmDialog(null, message,
-				title, JOptionPane.YES_NO_OPTION);
+		int choice = JOptionPane.showConfirmDialog(null, message, title,
+				JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
 			// JOptionPane.showConfirmDialog(arg0, arg1)
 			WelcomeMessage newMessage2 = new WelcomeMessage();
 			DifficultySelection newSelect = new DifficultySelection();
 			int newPlayerMoves = newSelect.getPlayerMoves();
-			movesTextField
-					.setText(Integer.toString(newPlayerMoves));
+			secondsRemaining = Integer.parseInt(newSelect.getGameSeconds());
+			movesTextField.setText(Integer.toString(newPlayerMoves));
+		//	timeCounter.getTimeField().setText(arg0);
 			logic.newGameStarts(newPlayerMoves);
 			guessTextField.setText(null);
 			logArea.setText(null);
 			digitsCounter = GUESS_DIGITS;
 			digitTextField.setText(Integer.toString(digitsCounter));
-		}
-		else {
+		} else {
 			frame.setVisible(false);
 			frame = null;
 		}
 	}
+
 	class CheckButtonListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			checkInput = new ValidateCheckInput(numsLine.toString());
+			if (!timeCounter.getStatus().equals("Paused")) {
+				if (checkInput.validateInput()) {
+					logLine = new StringBuilder("");
+					logic.gamePlay(numsLine.toString());
+					String result = logic.returnResult();
+					logArea.append(result);
+					// update player moves
+					playerMoves = logic.getMovesLeft();
+					movesTextField.setText(Integer.toString(playerMoves));
+					numsLine = new StringBuilder("");
+					guessTextField.setText(numsLine.toString());
+					digitsCounter = 4;
+					digitTextField.setText(Integer.toString(digitsCounter));
+					guessTextField.requestFocus();
+					secondsRemaining = timeCounter.getSecondsRemaining();
+					// check if game is lost
+					if (playerMoves <= 0 || secondsRemaining == 0) {
+						JOptionPane.showMessageDialog(null,
+								"Sorry you loose the game!");
+						anotherGame();
+					}
+					secondsRemaining = timeCounter.getSecondsRemaining();
+					if (logic.isGameWon() && secondsRemaining >0) {
+						JOptionPane.showMessageDialog(null,
+								"Congratulations You guessed the number "
+										+ guessTextField.getText()
+										+ " and You won the game. ");
+						// check if user want a new game
+						// //////// start a new game
+						// setPlayerMoves(CowsAndBulls.showDifficultyMessage());
+						anotherGame();
 
-			if (checkInput.validateInput()) {
-				logLine = new StringBuilder("");
-				logic.gamePlay(numsLine.toString());
-				String result = logic.returnResult();
-				logArea.append(result);
-				// update player moves
-				playerMoves = logic.getMovesLeft();
-				movesTextField.setText(Integer.toString(playerMoves));
-				numsLine = new StringBuilder("");
-				guessTextField.setText(numsLine.toString());
-				digitsCounter = 4;
-				digitTextField.setText(Integer.toString(digitsCounter));
-				guessTextField.requestFocus();
-				// check if game is lost
-				if (playerMoves <= 0) {
-					JOptionPane.showMessageDialog(null,
-							"Sorry you loose the game!");
-					anotherGame();
+					}
+				} else {
+					// clear screen; reset digits counter;
+					numsLine = new StringBuilder("");
+					guessTextField.setText(numsLine.toString());
+					digitsCounter = 4;
+					digitTextField.setText(Integer.toString(digitsCounter));
 				}
-				if (logic.isGameWon()) {
-					JOptionPane.showMessageDialog(null,
-							"Congratulations You guessed the number "
-									+ guessTextField.getText()
-									+ " and You won the game. ");
-					// check if user want a new game
-					// //////// start a new game
-					// setPlayerMoves(CowsAndBulls.showDifficultyMessage());
-					anotherGame();
-
-				}
-			} else {
-				// clear screen; reset digits counter;
-				numsLine = new StringBuilder("");
-				guessTextField.setText(numsLine.toString());
-				digitsCounter = 4;
-				digitTextField.setText(Integer.toString(digitsCounter));
 			}
 
 		}
@@ -149,7 +161,8 @@ public class CandBMainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getSource() instanceof JButton) {
+			if ((e.getSource() instanceof JButton)
+					&& (!timeCounter.getStatus().equals("Paused"))) {
 				JButton btn = (JButton) e.getSource();
 				if (digitsCounter > 0) {
 					String btnText = btn.getText();

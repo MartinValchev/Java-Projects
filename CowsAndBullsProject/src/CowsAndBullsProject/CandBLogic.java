@@ -14,6 +14,8 @@ public class CandBLogic {
 	private int bullCounter;
 	private static StringBuilder result;
 
+
+
 	public CandBLogic(int movesLeft) {
 		GenerateGuessNumber.getInstance();
 		guessNumber = GenerateGuessNumber.getInstance().generateRandom();
