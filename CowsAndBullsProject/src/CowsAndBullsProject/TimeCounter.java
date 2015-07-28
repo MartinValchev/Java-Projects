@@ -87,7 +87,21 @@ public class TimeCounter implements ActionListener, MouseListener {
 		update();
 
 	}
-
+	public void resetTimer(String seconds){
+		pauseTimer();
+		timerSeconds = Integer.parseInt(seconds);
+		delay = 1000;
+		period = 1000;
+		remaining = timerSeconds * 1000;
+		timeField.setText("Time : " + (remaining/1000));
+		lastUpdate = System.currentTimeMillis();
+		timeField.addActionListener(this);
+		timeField.addMouseListener(this);
+		timer = new Timer(period, this);
+		timer.setInitialDelay(delay);
+		status  = "Running";
+		timer.start();
+	}
 	public void update() {
 
 		now = System.currentTimeMillis(); // current time in ms
@@ -107,7 +121,7 @@ public class TimeCounter implements ActionListener, MouseListener {
 		}
 	}
 
-	private void pauseTimer() {
+	public void pauseTimer() {
 		now = System.currentTimeMillis();
 		remaining -= (now - lastUpdate);
 		timeField.setText("Pause");
@@ -116,6 +130,7 @@ public class TimeCounter implements ActionListener, MouseListener {
 	}
 
 	public void resumeTimer() {
+		
 		lastUpdate = System.currentTimeMillis();
 		timer.start();
 		status  = "Running";

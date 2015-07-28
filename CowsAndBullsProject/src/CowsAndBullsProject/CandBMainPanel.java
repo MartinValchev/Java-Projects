@@ -82,7 +82,7 @@ public class CandBMainPanel {
 	}
 
 	public void anotherGame() {
-		/////////////// set seconds remaining to the Time field;
+		// ///////////// set seconds remaining to the Time field;
 		String title = "New Game request";
 		String message = "Do you want another game?";
 		int choice = JOptionPane.showConfirmDialog(null, message, title,
@@ -92,9 +92,8 @@ public class CandBMainPanel {
 			WelcomeMessage newMessage2 = new WelcomeMessage();
 			DifficultySelection newSelect = new DifficultySelection();
 			int newPlayerMoves = newSelect.getPlayerMoves();
-			secondsRemaining = Integer.parseInt(newSelect.getGameSeconds());
 			movesTextField.setText(Integer.toString(newPlayerMoves));
-		//	timeCounter.getTimeField().setText(arg0);
+			timeCounter.resetTimer(newSelect.getGameSeconds());
 			logic.newGameStarts(newPlayerMoves);
 			guessTextField.setText(null);
 			logArea.setText(null);
@@ -130,10 +129,11 @@ public class CandBMainPanel {
 					if (playerMoves <= 0 || secondsRemaining == 0) {
 						JOptionPane.showMessageDialog(null,
 								"Sorry you loose the game!");
+						timeCounter.pauseTimer();
 						anotherGame();
 					}
 					secondsRemaining = timeCounter.getSecondsRemaining();
-					if (logic.isGameWon() && secondsRemaining >0) {
+					if (logic.isGameWon() && secondsRemaining > 0) {
 						JOptionPane.showMessageDialog(null,
 								"Congratulations You guessed the number "
 										+ guessTextField.getText()
@@ -141,6 +141,7 @@ public class CandBMainPanel {
 						// check if user want a new game
 						// //////// start a new game
 						// setPlayerMoves(CowsAndBulls.showDifficultyMessage());
+						timeCounter.pauseTimer();
 						anotherGame();
 
 					}
