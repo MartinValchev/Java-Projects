@@ -49,7 +49,7 @@ public class CandBMainPanel {
 		// frame.setLayout(new FlowLayout());
 		MainConsole mainConsole = new MainConsole("MainConsole");
 		InfoConsole infoConsole = new InfoConsole("InfoConsole");
-		timeCounter = new TimeCounter(gameSeconds);
+		timeCounter = new TimeCounter(gameSeconds,this);
 		infoConsole.addTimeCounter(timeCounter.getTimeCont());
 		secondsRemaining = timeCounter.getSecondsRemaining();
 		logic = new CandBLogic(playerMoves);
@@ -127,10 +127,7 @@ public class CandBMainPanel {
 					secondsRemaining = timeCounter.getSecondsRemaining();
 					// check if game is lost
 					if (playerMoves <= 0 || secondsRemaining == 0) {
-						JOptionPane.showMessageDialog(null,
-								"Sorry you loose the game!");
-						timeCounter.pauseTimer();
-						anotherGame();
+						gameLost();
 					}
 					secondsRemaining = timeCounter.getSecondsRemaining();
 					if (logic.isGameWon() && secondsRemaining > 0) {
@@ -156,8 +153,14 @@ public class CandBMainPanel {
 
 		}
 
-	}
+		
 
+	}
+	public void gameLost() {
+		JOptionPane.showMessageDialog(null,
+				"Sorry you loose the game!");
+		anotherGame();
+	}
 	class NumListener implements ActionListener {
 
 		@Override

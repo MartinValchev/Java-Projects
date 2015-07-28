@@ -31,8 +31,10 @@ public class TimeCounter implements ActionListener, MouseListener {
 	private GiveFont font;
 	private JButton pauseButton;
 	private String status;
+	private CandBMainPanel mainPanel;
 
-	public TimeCounter(String newSeconds) {
+	public TimeCounter(String newSeconds, CandBMainPanel newMainPanel) {
+		mainPanel = newMainPanel;
 		timeCont = new Container();
 		timeCont.setName("TimePanel");
 		//timeCont.setSize(300, 200);
@@ -118,6 +120,7 @@ public class TimeCounter implements ActionListener, MouseListener {
 		if (remaining == 0) {
 			timer.stop();
 			status  = "Paused";
+			mainPanel.gameLost();
 		}
 	}
 
