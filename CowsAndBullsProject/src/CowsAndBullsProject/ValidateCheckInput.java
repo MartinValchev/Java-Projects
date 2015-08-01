@@ -5,17 +5,19 @@ import javax.swing.JOptionPane;
 public class ValidateCheckInput {
 
 	String userInput;
+	int guessNumberLength;
 
-	public ValidateCheckInput(String newUserInput) {
+	public ValidateCheckInput(String newUserInput, int guessDigits) {
 		userInput = newUserInput;
+		guessNumberLength = guessDigits;
 	}
 
 	public boolean validateInput() {
-		if (userInput.length() < 4) {
+		if (userInput.length() < guessNumberLength) {
 			JOptionPane
-					.showMessageDialog(
-							null,
-							"The input you entered is not 4 digit number. Please try again",
+					.showMessageDialog(null, "The input you entered is not "
+							+ guessNumberLength
+							+ " digit number. Please try again",
 							"Error in number format",
 							JOptionPane.WARNING_MESSAGE, null);
 			return false;

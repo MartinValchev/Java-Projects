@@ -25,7 +25,7 @@ public class CandBMainPanel {
 	static TimeCounter timeCounter;
 	static int secondsRemaining;
 	private static final int NUM_QUANTITY = 10;
-	private static final int GUESS_DIGITS = 4;
+	private int guessDigits;
 	static int digitsCounter;
 	static StringBuilder numsLine;
 	static StringBuilder logLine;
@@ -39,8 +39,10 @@ public class CandBMainPanel {
 	public CandBMainPanel(int newPlayerMoves, String newGameSeconds) {
 		playerMoves = newPlayerMoves;
 		gameSeconds = newGameSeconds;
-		digitsCounter = 4;
-		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber();
+		GenerateGuessNumber.getInstance().generateRandom();
+		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber(playerMoves);
+		guessDigits = (Integer.toString(numberToGuess)).length();
+		digitsCounter = guessDigits;
 		frame = new JFrame("Cows and Bulls Game");
 		frame.setSize(600, 400);
 		frame.setMinimumSize(new Dimension(600, 400));
@@ -97,7 +99,7 @@ public class CandBMainPanel {
 			logic.newGameStarts(newPlayerMoves);
 			guessTextField.setText(null);
 			logArea.setText(null);
-			digitsCounter = GUESS_DIGITS;
+			digitsCounter = guessDigits;
 			digitTextField.setText(Integer.toString(digitsCounter));
 		} else {
 			frame.setVisible(false);
@@ -109,7 +111,7 @@ public class CandBMainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			checkInput = new ValidateCheckInput(numsLine.toString());
+			checkInput = new ValidateCheckInput(numsLine.toString(),guessDigits);
 			if (!timeCounter.getStatus().equals("Paused")) {
 				if (checkInput.validateInput()) {
 					logLine = new StringBuilder("");
@@ -121,7 +123,7 @@ public class CandBMainPanel {
 					movesTextField.setText(Integer.toString(playerMoves));
 					numsLine = new StringBuilder("");
 					guessTextField.setText(numsLine.toString());
-					digitsCounter = 4;
+					digitsCounter = guessDigits;
 					digitTextField.setText(Integer.toString(digitsCounter));
 					guessTextField.requestFocus();
 					secondsRemaining = timeCounter.getSecondsRemaining();
@@ -146,7 +148,7 @@ public class CandBMainPanel {
 					// clear screen; reset digits counter;
 					numsLine = new StringBuilder("");
 					guessTextField.setText(numsLine.toString());
-					digitsCounter = 4;
+					digitsCounter = guessDigits;
 					digitTextField.setText(Integer.toString(digitsCounter));
 				}
 			}
@@ -200,7 +202,7 @@ public class CandBMainPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				numsLine = new StringBuilder("");
 				guessTextField.setText(numsLine.toString());
-				digitsCounter = 4;
+				digitsCounter = guessDigits;
 				digitTextField.setText(Integer.toString(digitsCounter));
 				guessTextField.requestFocus();
 

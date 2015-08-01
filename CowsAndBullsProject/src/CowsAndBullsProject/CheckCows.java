@@ -4,12 +4,13 @@ public class CheckCows {
 	private int genNumber;
 	private int cowsCount;
 	private TransformNumber transfNum;
-	private static final int NUMBER_LENGTH = 4;
+	private int numberLength;
 
 	public CheckCows(int generatedNum) {
 		genNumber = generatedNum;
+		numberLength = (Integer.toString(genNumber)).length();
 		resetCowCount();
-		transfNum = new TransformNumber(4);
+		transfNum = new TransformNumber(numberLength);
 	}
 	public int checkCows(int userGuess){
 		resetCowCount();

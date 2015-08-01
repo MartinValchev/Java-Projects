@@ -3,14 +3,16 @@ package CowsAndBullsProject;
 import javax.swing.JOptionPane;
 
 public class DifficultySelection {
-	private static final String[] levelModes = { "easy", "medium", "hard" };
+	private static final String[] levelModes = { "easy", "medium", "hard",
+			"hardest", "insane" };
+	//private static final String[] gameModes = { "Time Mode", "Moves mode" };
 	int playerMoves;
 
 	public DifficultySelection() {
-		playerMoves = showDifficultyMessage();
+
 	}
-	
-	private static int showDifficultyMessage() {
+
+	public int showDifficultyMessage() {
 
 		String mode = (String) JOptionPane.showInputDialog(null,
 				"Please choose game difficulty", "Choose difficulty",
@@ -20,26 +22,50 @@ public class DifficultySelection {
 			return 25;
 		} else if (mode.equals("medium")) {
 			return 20;
-		} else {
+		} else if (mode.equals("hard")) {
 			return 15;
+		} else if (mode.equals("hardest")) {
+			return 35;
+		}
+		else{
+			return 30;
 		}
 	}
-	public String getGameSeconds(){
-		String gameSeconds ="";
-		if (playerMoves ==25){
-			gameSeconds ="600"; // 10 min
+
+	public String getGameSeconds() {
+		String gameSeconds = "";
+		if (playerMoves == 25) {
+			gameSeconds = "600"; // 10 min
+		} else if (playerMoves == 20) {
+			gameSeconds = "420"; // 7 min
+		} else if (playerMoves == 15) {
+			gameSeconds = "300"; // 5 min
 		}
-		else if(playerMoves ==20){
-			gameSeconds ="420"; // 7 min
+		else if (playerMoves == 35) {
+			gameSeconds = "360"; // 6 min
 		}
-		else if(playerMoves ==15){
-			gameSeconds ="300"; // 5 min
+		else if (playerMoves == 30) {
+			gameSeconds = "330"; // 5,5 min
 		}
 		return gameSeconds;
 	}
 
+	public void setPlayerMoves() {
+		playerMoves = showDifficultyMessage();
+	}
+
 	public int getPlayerMoves() {
+
 		return playerMoves;
 	}
 
+	/*
+	 * public int getGameMode() { String gameMode = (String) JOptionPane
+	 * .showInputDialog( null,
+	 * "Please choose game mode: 1.Time mode - during the game only the timer runs  "
+	 * + "2.Moves mode - during the game only the moves counter is running",
+	 * "Choose game mode", JOptionPane.QUESTION_MESSAGE, null, gameModes,
+	 * gameModes[0]); // set the player moves if (gameMode.equals("Time Mode"))
+	 * { return 1; } else { return 2; } }
+	 */
 }

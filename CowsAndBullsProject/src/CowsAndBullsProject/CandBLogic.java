@@ -47,7 +47,7 @@ public class CandBLogic {
 	}
 	public void newGameStarts(int newMovesLeft){
 		GenerateGuessNumber.getInstance().resetNumber();
-		guessNumber = GenerateGuessNumber.getInstance().getGuessNumber();
+		guessNumber = GenerateGuessNumber.getInstance().getGuessNumber(newMovesLeft);
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;

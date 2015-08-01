@@ -48,7 +48,7 @@ public class InfoConsoleWidgets {
 	}
 
 	protected void setWidgets() {
-		guessDisplay = new JTextField(4);
+		guessDisplay = new JTextField(6);
 		guessDisplay.setName("GuessTextField");
 		guessDisplay.setSize(5, 3);
 		guessDisplay.setColumns(5);
