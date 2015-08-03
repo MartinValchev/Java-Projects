@@ -36,7 +36,7 @@ public class GenerateGuessNumber {
 	public void resetNumber(){
 		generateRandom();
 	}
-	public int getGuessNumber(int playerMoves){
+	public void setGuessNumber(int playerMoves){
 		if (playerMoves ==25){
 			guessNumber /=100; //easy level
 		}
@@ -49,9 +49,10 @@ public class GenerateGuessNumber {
 		else if (playerMoves ==35){
 			guessNumber /=10; //mode hardest;
 		}
-		else if (playerMoves ==30){
-			return guessNumber; // insane level
-		}
+	
+		
+	}
+	public int getGuessNumber(){
 		return guessNumber;
 	}
 }

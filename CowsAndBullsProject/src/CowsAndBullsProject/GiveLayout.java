@@ -26,6 +26,9 @@ public class GiveLayout {
 		} else if (panelName.equals("LogConsole")) {
 			compLayout = new FlowLayout();
 		}
+		else if (panelName.equals("UserConsole")) {
+			compLayout = new FlowLayout();
+		}
 		console.setLayout(compLayout);
 	}
 
@@ -39,6 +42,9 @@ public class GiveLayout {
 			return "BorderLayout.CENTER";
 		} else if (consName.equals("LogConsole")) {
 			return "BorderLayout.EAST";
+		}
+		else if (consName.equals("UserConsole")){
+			return "BorderLayout.SOUTH";
 		}
 		return null;
 	}

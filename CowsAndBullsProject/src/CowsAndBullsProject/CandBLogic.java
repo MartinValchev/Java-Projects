@@ -12,21 +12,30 @@ public class CandBLogic {
 	private ValidateCheckInput validateInput;
 	private int cowCounter;
 	private int bullCounter;
+	private ScoreGenerator score;
 	private static StringBuilder result;
 
 
 
-	public CandBLogic(int movesLeft) {
-		GenerateGuessNumber.getInstance();
-		guessNumber = GenerateGuessNumber.getInstance().generateRandom();
+	public CandBLogic(int movesLeft,ScoreGenerator newScore ) {
+		guessNumber = GenerateGuessNumber.getInstance().getGuessNumber();
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;
 		this.movesLeft = movesLeft;
 		result = new StringBuilder("");
+		score = newScore;
 	}
-
-
+	public int getCowCounter(){
+		return cowCounter;
+	}
+	public int getBullCounter(){
+		return bullCounter;
+	}
+	public String returnScore(){
+		 String scoreResult = Integer.toString(score.updateScore(this));
+		 return scoreResult;
+	}
 	public String returnResult() {
 		//remove
 		//System.out.println(guessNumber);
@@ -47,7 +56,8 @@ public class CandBLogic {
 	}
 	public void newGameStarts(int newMovesLeft){
 		GenerateGuessNumber.getInstance().resetNumber();
-		guessNumber = GenerateGuessNumber.getInstance().getGuessNumber(newMovesLeft);
+		GenerateGuessNumber.getInstance().setGuessNumber(newMovesLeft);
+		guessNumber = GenerateGuessNumber.getInstance().getGuessNumber();
 		bulls = new CheckBulls(guessNumber);
 		cows = new CheckCows(guessNumber);
 		isGameEnded = false;

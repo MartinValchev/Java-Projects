@@ -19,23 +19,29 @@ public class GiveFont {
 		if (compName.equals("GuessTextField")) {
 			font = new Font("Arial", Font.BOLD, 26);
 		}
-		if (compName.equals("MovesTextField")) {
+		else if (compName.equals("MovesTextField")) {
 			font = new Font("Arial", Font.PLAIN, 14);
 		}
-		if (compName.equals("digitsLeftLabel")
+		else if (compName.equals("digitsLeftLabel")
 				|| compName.equals("movesLeftLabel")) {
 			font = new Font("verdana", Font.BOLD, 14);
 		}
-		if (compName.equals("textArea")) {
+		else if (compName.equals("textArea")) {
 			font = new Font("verdana", Font.PLAIN, 16);
 		}
-		if (compName.equals("welcome")) {
+		else if (compName.equals("welcome")) {
 			font = new Font("verdana", Font.BOLD, 12);
 		}
-		if (compName.equals("TimeField")) {
+		else if (compName.equals("TimeField")) {
 			font = new Font("Arial", Font.PLAIN, 14);
 		}
-		if (compName.equals("PauseButton")) {
+		else if (compName.equals("PauseButton")) {
+			font = new Font("verdana", Font.BOLD, 14);
+		}
+		else if (compName.equals("userField")) {
+			font = new Font("verdana", Font.ITALIC, 14);
+		}
+		else if (compName.equals("userLabel")) {
 			font = new Font("verdana", Font.BOLD, 14);
 		}
 		comp.setFont(font);

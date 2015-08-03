@@ -1,6 +1,7 @@
 package CowsAndBullsProject;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -18,6 +19,7 @@ import projectFinale.CowsAndBulls;
 public class CandBMainPanel {
 	ButtonsConsole buttonsConsole;
 	InfoConsole infoConsole;
+	UserConsole userConsole;
 	static JTextField guessTextField;
 	static JTextField movesTextField;
 	static JTextField digitTextField;
@@ -33,20 +35,25 @@ public class CandBMainPanel {
 	private String gameSeconds;
 	private int numberToGuess;
 	private ValidateCheckInput checkInput;
+	private ScoreGenerator score;
 	private CandBLogic logic;
 	private JFrame frame;
+	private Color backgroundColor;
 
 	public CandBMainPanel(int newPlayerMoves, String newGameSeconds) {
 		playerMoves = newPlayerMoves;
 		gameSeconds = newGameSeconds;
 		GenerateGuessNumber.getInstance().generateRandom();
-		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber(playerMoves);
+		GenerateGuessNumber.getInstance().setGuessNumber(playerMoves);
+		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber();
 		guessDigits = (Integer.toString(numberToGuess)).length();
 		digitsCounter = guessDigits;
 		frame = new JFrame("Cows and Bulls Game");
 		frame.setSize(600, 400);
 		frame.setMinimumSize(new Dimension(600, 400));
 		frame.setLocation(50, 50);
+		backgroundColor = new Color(200, 255, 182);
+		frame.setBackground(backgroundColor);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// frame.setLayout(new FlowLayout());
 		MainConsole mainConsole = new MainConsole("MainConsole");
@@ -54,7 +61,8 @@ public class CandBMainPanel {
 		timeCounter = new TimeCounter(gameSeconds,this);
 		infoConsole.addTimeCounter(timeCounter.getTimeCont());
 		secondsRemaining = timeCounter.getSecondsRemaining();
-		logic = new CandBLogic(playerMoves);
+		score = new ScoreGenerator();
+		logic = new CandBLogic(playerMoves,score);
 		LogConsole logConsole = new LogConsole("LogConsole");
 		buttonsConsole = new ButtonsConsole("ButtonsConsole");
 		logArea = logConsole.getLogArea();
@@ -64,7 +72,7 @@ public class CandBMainPanel {
 		numsLine = new StringBuilder();
 		digitTextField.setText(Integer.toString(digitsCounter));
 		movesTextField.setText(Integer.toString(playerMoves));
-
+		userConsole = new UserConsole();
 		addActionButton();/*
 						 * mainConsole.addPanels(infoConsole);
 						 * mainConsole.addPanels(buttonsConsole);
@@ -78,6 +86,8 @@ public class CandBMainPanel {
 				BorderLayout.CENTER);
 		(mainConsole.getConsole()).add(logConsole.getConsole(),
 				BorderLayout.EAST);
+		(mainConsole.getConsole()).add(userConsole.getConsole(),
+				BorderLayout.SOUTH);
 		frame.add(mainConsole.getConsole());
 		frame.setVisible(true);
 
@@ -115,7 +125,7 @@ public class CandBMainPanel {
 			if (!timeCounter.getStatus().equals("Paused")) {
 				if (checkInput.validateInput()) {
 					logLine = new StringBuilder("");
-					logic.gamePlay(numsLine.toString());
+					logic.gamePlay((numsLine.toString()).trim());
 					String result = logic.returnResult();
 					logArea.append(result);
 					// update player moves
