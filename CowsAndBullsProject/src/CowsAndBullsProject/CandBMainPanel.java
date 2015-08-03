@@ -23,6 +23,7 @@ public class CandBMainPanel {
 	static JTextField guessTextField;
 	static JTextField movesTextField;
 	static JTextField digitTextField;
+	static JTextField scoreField;
 	static JTextArea logArea;
 	static TimeCounter timeCounter;
 	static int secondsRemaining;
@@ -73,6 +74,7 @@ public class CandBMainPanel {
 		digitTextField.setText(Integer.toString(digitsCounter));
 		movesTextField.setText(Integer.toString(playerMoves));
 		userConsole = new UserConsole();
+		scoreField = userConsole.getScoreField();
 		addActionButton();/*
 						 * mainConsole.addPanels(infoConsole);
 						 * mainConsole.addPanels(buttonsConsole);
@@ -137,6 +139,7 @@ public class CandBMainPanel {
 					digitTextField.setText(Integer.toString(digitsCounter));
 					guessTextField.requestFocus();
 					secondsRemaining = timeCounter.getSecondsRemaining();
+					scoreField.setText(Integer.toString(score.updateScore(logic)));
 					// check if game is lost
 					if (playerMoves <= 0 || secondsRemaining == 0) {
 						gameLost();
