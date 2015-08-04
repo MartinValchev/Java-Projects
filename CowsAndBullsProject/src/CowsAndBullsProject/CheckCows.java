@@ -13,6 +13,7 @@ public class CheckCows {
 		transfNum = new TransformNumber(numberLength);
 	}
 	public int checkCows(int userGuess){
+		System.out.println(genNumber);
 		resetCowCount();
 		int[] generatedArr = transfNum.transformNumber(genNumber);
 		int[] userArr = transfNum.transformNumber(userGuess);

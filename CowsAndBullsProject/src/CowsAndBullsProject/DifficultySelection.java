@@ -31,7 +31,6 @@ public class DifficultySelection {
 			return 30;
 		}
 	}
-
 	public String getGameSeconds() {
 		String gameSeconds = "";
 		if (playerMoves == 25) {

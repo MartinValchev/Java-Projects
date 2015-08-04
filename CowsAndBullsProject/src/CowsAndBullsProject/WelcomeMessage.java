@@ -28,4 +28,15 @@ public class WelcomeMessage {
 				JOptionPane.INFORMATION_MESSAGE, null);
 	}
 
+	public String UserMessage() {
+		String userMessage = "Please choose username";
+		String userName = JOptionPane.showInputDialog(userMessage,
+				"choose username");
+		if (userName.length() == 0) {
+			return "unknown";
+		} else {
+			return userName;
+		}
+	}
+
 }

@@ -24,6 +24,7 @@ public class CandBMainPanel {
 	static JTextField movesTextField;
 	static JTextField digitTextField;
 	static JTextField scoreField;
+	private JTextField userField;
 	static JTextArea logArea;
 	static TimeCounter timeCounter;
 	static int secondsRemaining;
@@ -40,10 +41,13 @@ public class CandBMainPanel {
 	private CandBLogic logic;
 	private JFrame frame;
 	private Color backgroundColor;
-
-	public CandBMainPanel(int newPlayerMoves, String newGameSeconds) {
+	private String userName;
+	private FinalMessage finalMessage;
+	
+	public CandBMainPanel(int newPlayerMoves, String newGameSeconds,String newUserName) {
 		playerMoves = newPlayerMoves;
 		gameSeconds = newGameSeconds;
+		userName = newUserName;
 		GenerateGuessNumber.getInstance().generateRandom();
 		GenerateGuessNumber.getInstance().setGuessNumber(playerMoves);
 		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber();
@@ -51,7 +55,7 @@ public class CandBMainPanel {
 		digitsCounter = guessDigits;
 		frame = new JFrame("Cows and Bulls Game");
 		frame.setSize(600, 400);
-		frame.setMinimumSize(new Dimension(600, 400));
+		frame.setMinimumSize(new Dimension(600, 460));
 		frame.setLocation(50, 50);
 		backgroundColor = new Color(200, 255, 182);
 		frame.setBackground(backgroundColor);
@@ -62,7 +66,7 @@ public class CandBMainPanel {
 		timeCounter = new TimeCounter(gameSeconds,this);
 		infoConsole.addTimeCounter(timeCounter.getTimeCont());
 		secondsRemaining = timeCounter.getSecondsRemaining();
-		score = new ScoreGenerator();
+		score = new ScoreGenerator(playerMoves);
 		logic = new CandBLogic(playerMoves,score);
 		LogConsole logConsole = new LogConsole("LogConsole");
 		buttonsConsole = new ButtonsConsole("ButtonsConsole");
@@ -74,6 +78,8 @@ public class CandBMainPanel {
 		digitTextField.setText(Integer.toString(digitsCounter));
 		movesTextField.setText(Integer.toString(playerMoves));
 		userConsole = new UserConsole();
+		userField = userConsole.getUserField();
+		userField.setText(userName);
 		scoreField = userConsole.getScoreField();
 		addActionButton();/*
 						 * mainConsole.addPanels(infoConsole);
@@ -94,29 +100,27 @@ public class CandBMainPanel {
 		frame.setVisible(true);
 
 	}
-
+	public void quitGame(){
+		frame.setVisible(false);
+		frame = null;
+	}
 	public void anotherGame() {
 		// ///////////// set seconds remaining to the Time field;
 		String title = "New Game request";
 		String message = "Do you want another game?";
-		int choice = JOptionPane.showConfirmDialog(null, message, title,
-				JOptionPane.YES_NO_OPTION);
-		if (choice == JOptionPane.YES_OPTION) {
 			// JOptionPane.showConfirmDialog(arg0, arg1)
 			WelcomeMessage newMessage2 = new WelcomeMessage();
-			DifficultySelection newSelect = new DifficultySelection();
-			int newPlayerMoves = newSelect.getPlayerMoves();
+			DifficultySelection  select = new DifficultySelection();
+			select.setPlayerMoves();
+			int newPlayerMoves = select.getPlayerMoves();
 			movesTextField.setText(Integer.toString(newPlayerMoves));
-			timeCounter.resetTimer(newSelect.getGameSeconds());
+			timeCounter.resetTimer(select.getGameSeconds());
 			logic.newGameStarts(newPlayerMoves);
 			guessTextField.setText(null);
 			logArea.setText(null);
 			digitsCounter = guessDigits;
 			digitTextField.setText(Integer.toString(digitsCounter));
-		} else {
-			frame.setVisible(false);
-			frame = null;
-		}
+
 	}
 
 	class CheckButtonListener implements ActionListener {
@@ -150,11 +154,13 @@ public class CandBMainPanel {
 								"Congratulations You guessed the number "
 										+ guessTextField.getText()
 										+ " and You won the game. ");
+						int finalScore = score.generateFinalScore();
+						finalMessage = new FinalMessage(finalScore, userName,CandBMainPanel.this);
 						// check if user want a new game
 						// //////// start a new game
 						// setPlayerMoves(CowsAndBulls.showDifficultyMessage());
 						timeCounter.pauseTimer();
-						anotherGame();
+						//anotherGame();
 
 					}
 				} else {
