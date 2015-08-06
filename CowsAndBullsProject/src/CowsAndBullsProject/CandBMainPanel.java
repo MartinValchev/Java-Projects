@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -33,21 +35,29 @@ public class CandBMainPanel {
 	static int digitsCounter;
 	static StringBuilder numsLine;
 	static StringBuilder logLine;
-	static int playerMoves;
+	private int playerMoves;
 	private String gameSeconds;
 	private int numberToGuess;
 	private ValidateCheckInput checkInput;
 	private ScoreGenerator score;
+	private int finalScore;
 	private CandBLogic logic;
 	private JFrame frame;
 	private Color backgroundColor;
 	private String userName;
 	private FinalMessage finalMessage;
-	
-	public CandBMainPanel(int newPlayerMoves, String newGameSeconds,String newUserName) {
+	private HighScores highScores;
+	private List<JButton> clickedButtons;
+	private int initialPlayerMoves;
+	private WelcomeMessage welcome;
+	public CandBMainPanel(int newPlayerMoves, String newGameSeconds,WelcomeMessage newWelcome) {
 		playerMoves = newPlayerMoves;
+		initialPlayerMoves = playerMoves;
+		highScores = new HighScores();
 		gameSeconds = newGameSeconds;
-		userName = newUserName;
+		welcome = newWelcome;
+		userName = welcome.getUserName();
+		clickedButtons = new ArrayList<JButton>();
 		GenerateGuessNumber.getInstance().generateRandom();
 		GenerateGuessNumber.getInstance().setGuessNumber(playerMoves);
 		numberToGuess = GenerateGuessNumber.getInstance().getGuessNumber();
@@ -100,9 +110,22 @@ public class CandBMainPanel {
 		frame.setVisible(true);
 
 	}
+	public String getUserName(){
+		return userName;
+	}
+	public int getMovesToWin(){
+		int movesToWin = (initialPlayerMoves - playerMoves);
+		return movesToWin;
+	}
 	public void quitGame(){
 		frame.setVisible(false);
 		frame = null;
+	}
+	public int getFinalScore(){
+		return finalScore;
+	}
+	public int secondToWin(){
+		return secondsRemaining;
 	}
 	public void anotherGame() {
 		// ///////////// set seconds remaining to the Time field;
@@ -120,6 +143,10 @@ public class CandBMainPanel {
 			logArea.setText(null);
 			digitsCounter = guessDigits;
 			digitTextField.setText(Integer.toString(digitsCounter));
+			clickedButtons.clear();
+			score.resetScore();
+			scoreField.setText(Integer.toString(score.getCurrentScore()));
+			userField.setText(userName);
 
 	}
 
@@ -127,6 +154,7 @@ public class CandBMainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			enableButtons();
 			checkInput = new ValidateCheckInput(numsLine.toString(),guessDigits);
 			if (!timeCounter.getStatus().equals("Paused")) {
 				if (checkInput.validateInput()) {
@@ -154,8 +182,15 @@ public class CandBMainPanel {
 								"Congratulations You guessed the number "
 										+ guessTextField.getText()
 										+ " and You won the game. ");
-						int finalScore = score.generateFinalScore();
-						finalMessage = new FinalMessage(finalScore, userName,CandBMainPanel.this);
+						finalScore = score.generateFinalScore();
+						secondsRemaining = timeCounter.getSecondsRemaining();
+						try {
+							highScores.pushToDatabase(getUserName(), initialPlayerMoves, playerMoves, secondsRemaining, finalScore);
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						finalMessage = new FinalMessage(CandBMainPanel.this,highScores);
 						// check if user want a new game
 						// //////// start a new game
 						// setPlayerMoves(CowsAndBulls.showDifficultyMessage());
@@ -182,6 +217,15 @@ public class CandBMainPanel {
 				"Sorry you loose the game!");
 		anotherGame();
 	}
+	public void enableButtons(){
+		for (JButton button : clickedButtons){
+			button.setEnabled(true);
+		}
+	}
+	public void setUserName(){
+		welcome.setUserName();
+		userName = welcome.getUserName();
+	}
 	class NumListener implements ActionListener {
 
 		@Override
@@ -196,6 +240,9 @@ public class CandBMainPanel {
 					digitTextField.setText(Integer.toString(digitsCounter));
 					updateText();
 					guessTextField.requestFocus();
+					// gray out the button when clicked
+					btn.setEnabled(false);
+					clickedButtons.add(btn);
 				}
 			}
 
@@ -224,7 +271,7 @@ public class CandBMainPanel {
 				digitsCounter = guessDigits;
 				digitTextField.setText(Integer.toString(digitsCounter));
 				guessTextField.requestFocus();
-
+				enableButtons();
 			}
 
 		});

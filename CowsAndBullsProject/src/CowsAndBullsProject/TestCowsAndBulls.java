@@ -23,12 +23,12 @@ public class TestCowsAndBulls {
 
 	public static void main(String[] args) {
 		WelcomeMessage message = new WelcomeMessage();
-		String userName = message.UserMessage();
+		message.setUserName();
 		DifficultySelection select = new DifficultySelection();	
 		select.setPlayerMoves();	
 		int playerMoves = select.getPlayerMoves();
 		String gameSeconds = select.getGameSeconds();
-	CandBMainPanel panel = new CandBMainPanel(playerMoves, gameSeconds,userName);
+	CandBMainPanel panel = new CandBMainPanel(playerMoves, gameSeconds,message);
 	}
 
 }

@@ -58,13 +58,5 @@ public class DifficultySelection {
 		return playerMoves;
 	}
 
-	/*
-	 * public int getGameMode() { String gameMode = (String) JOptionPane
-	 * .showInputDialog( null,
-	 * "Please choose game mode: 1.Time mode - during the game only the timer runs  "
-	 * + "2.Moves mode - during the game only the moves counter is running",
-	 * "Choose game mode", JOptionPane.QUESTION_MESSAGE, null, gameModes,
-	 * gameModes[0]); // set the player moves if (gameMode.equals("Time Mode"))
-	 * { return 1; } else { return 2; } }
-	 */
+
 }

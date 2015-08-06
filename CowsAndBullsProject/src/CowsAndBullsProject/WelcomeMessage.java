@@ -3,7 +3,7 @@ package CowsAndBullsProject;
 import javax.swing.JOptionPane;
 
 public class WelcomeMessage {
-
+	String userName;
 	public WelcomeMessage() {
 		String initialMessage = "Wellcome to Cows and Bulls Game! "
 				+ "\n"
@@ -28,15 +28,18 @@ public class WelcomeMessage {
 				JOptionPane.INFORMATION_MESSAGE, null);
 	}
 
-	public String UserMessage() {
+	public void setUserName() {
 		String userMessage = "Please choose username";
-		String userName = JOptionPane.showInputDialog(userMessage,
+		String newUserName = JOptionPane.showInputDialog(userMessage,
 				"choose username");
-		if (userName.length() == 0) {
-			return "unknown";
+		if (newUserName.length() == 0) {
+			userName= "unknown";
 		} else {
-			return userName;
+			userName=  newUserName;
 		}
+	}
+	public String getUserName(){
+		return userName;
 	}
 
 }
