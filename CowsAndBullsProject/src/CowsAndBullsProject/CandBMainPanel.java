@@ -182,7 +182,7 @@ public class CandBMainPanel {
 								"Congratulations You guessed the number "
 										+ guessTextField.getText()
 										+ " and You won the game. ");
-						finalScore = score.generateFinalScore();
+						finalScore = score.generateFinalScore(true);
 						secondsRemaining = timeCounter.getSecondsRemaining();
 						try {
 							highScores.pushToDatabase(getUserName(), initialPlayerMoves, playerMoves, secondsRemaining, finalScore);
@@ -215,7 +215,16 @@ public class CandBMainPanel {
 	public void gameLost() {
 		JOptionPane.showMessageDialog(null,
 				"Sorry you loose the game!");
-		anotherGame();
+		finalScore = score.generateFinalScore(false);
+		secondsRemaining = timeCounter.getSecondsRemaining();
+		try {
+			highScores.pushToDatabase(getUserName(), initialPlayerMoves, playerMoves, secondsRemaining, finalScore);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finalMessage = new FinalMessage(CandBMainPanel.this,highScores);
+		timeCounter.pauseTimer();
 	}
 	public void enableButtons(){
 		for (JButton button : clickedButtons){
