@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-public class CampaignCreate {
+public class CampaignModule {
 	JFrame campFrame; 
 	String campaignName;
 	JLabel windowName;
@@ -27,12 +27,14 @@ public class CampaignCreate {
 	JTextField impressionsField;
 	Container infoCont;
 	JButton submitButton;
-	BannerPosition banerPos;
+	JButton addwebSiteButton;
+	JButton addPositionButton;
+	BannerPositionModule banerPos;
 	DateManipulator dates;
 	
-	public CampaignCreate(String newCampName) {
-		campFrame= new JFrame();
-		campFrame.setSize(300, 400);
+	public CampaignModule(String newCampName) {
+		campFrame= new JFrame("Campaign Module");
+		campFrame.setSize(300, 200);
 		campFrame.setResizable(false);
 		campFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		campFrame.setLayout(new BorderLayout());

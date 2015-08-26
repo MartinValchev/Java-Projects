@@ -13,7 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class MainMenu {
+public class MainMenuModule {
 	JFrame mainFrame;
 	JButton addCampaign;
 	JButton addBannerPosition;
@@ -28,7 +28,7 @@ public class MainMenu {
 	JPanel closePanel;
 	//Container mainFrameCont;
 	
-	public MainMenu() {
+	public MainMenuModule() {
 		mainFrame = new JFrame("Main Menu");
 		mainFrame.setSize(400, 400);
 		mainFrame.setResizable(false);
