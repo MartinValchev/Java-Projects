@@ -9,6 +9,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -26,25 +27,30 @@ import javax.swing.event.ListSelectionListener;
 public class CampaignPosModule extends JPanel implements ListSelectionListener {
 	private JList list;
 	private DefaultListModel listModel;
-	private static final String removeString = "Remove";
+	private static final String removeString = "Del";
 	private static final String addString = "Add";
 	private JButton removeButton;
 	private JButton addButton;
-	private JTextField positionsNameField;
-
+	private JTextField impressionsField;
+	private String[] positionStrings;
+	private JComboBox positionList;
 	public CampaignPosModule() {
 		super(new BorderLayout());
 		listModel = new DefaultListModel();
-		listModel.addElement("Pesho");
-		listModel.addElement("Gosho");
-		listModel.addElement("Ivan");
-		listModel.addElement("Pavel");
+		listModel.addElement("5000 - Position 1");
+		listModel.addElement("4000 - Position 2");
+		listModel.addElement("3000 - Position 3");
+		listModel.addElement("5000 - Position 4");
 		list = new JList(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
 		list.addListSelectionListener(this);
 		list.setVisibleRowCount(5);
 		JScrollPane listScrollPane = new JScrollPane(list);
+		//
+		positionStrings = new String[] { "Position 1", "Position 2", "Position 3", "Position 4"};
+		positionList = new JComboBox(positionStrings);
+		positionList.setSelectedIndex(0);
 		//
 		addButton = new JButton(addString);
 		AddListener addListener = new AddListener(addButton);
@@ -56,9 +62,10 @@ public class CampaignPosModule extends JPanel implements ListSelectionListener {
 		removeButton.setActionCommand(removeString);
 		removeButton.addActionListener(new RemoveListener());
 		//
-		positionsNameField = new JTextField(10);
-		positionsNameField.addActionListener(addListener);
-		positionsNameField.getDocument().addDocumentListener(addListener);
+		impressionsField = new JTextField(12);
+		impressionsField.setText("daily impressions");
+		impressionsField.addActionListener(addListener);
+		impressionsField.getDocument().addDocumentListener(addListener);
 		//
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -66,11 +73,13 @@ public class CampaignPosModule extends JPanel implements ListSelectionListener {
 		buttonPane.add(Box.createHorizontalStrut(5));
 		buttonPane.add(new JSeparator(SwingConstants.VERTICAL));
 		buttonPane.add(Box.createHorizontalStrut(5));
-		buttonPane.add(positionsNameField);
+		buttonPane.add(impressionsField);
+		buttonPane.add(positionList);
 		buttonPane.add(addButton);
 		buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		add(buttonPane, BorderLayout.NORTH);
 		add(listScrollPane, BorderLayout.CENTER);
-		add(buttonPane, BorderLayout.PAGE_END);
+		
 	}
 
 	private static void createAndShowGUI() {

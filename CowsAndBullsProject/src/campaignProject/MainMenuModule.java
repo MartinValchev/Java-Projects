@@ -16,12 +16,12 @@ import javax.swing.JPanel;
 public class MainMenuModule {
 	JFrame mainFrame;
 	JButton addCampaign;
-	JButton addBannerPosition;
+	JButton editCampaignButton;
 	JButton showOccupacy;
 	JButton settingsButton;
 	JButton closeButton;
 	JPanel campaignPanel;
-	JPanel bannerPanel;
+	JPanel editCampaignPanel;
 	JPanel occupacyPanel;
 	Container settingsCont;
 	JPanel centerPanel;
@@ -38,8 +38,8 @@ public class MainMenuModule {
 		// panels 
 		campaignPanel = new JPanel();
 		campaignPanel.setLayout(new FlowLayout());
-		bannerPanel = new JPanel();
-		bannerPanel.setLayout(new FlowLayout());
+		editCampaignPanel = new JPanel();
+		editCampaignPanel.setLayout(new FlowLayout());
 		occupacyPanel  = new JPanel();
 		occupacyPanel.setLayout(new FlowLayout());
 		centerPanel = new JPanel();
@@ -53,12 +53,12 @@ public class MainMenuModule {
 		addCampaign.setBackground(new Color(205, 172, 141));
 		addCampaign.setName("addCampaingButton");
 		addCampaign.addActionListener(new AddCampaingListener());
-		addBannerPosition = new JButton("Add Banner");
-		addBannerPosition.setBackground(new Color(143, 71, 0));
-		addBannerPosition.setName("AddBannerPosition");
-		addBannerPosition.addActionListener(new AddBannerPosListener());
+		editCampaignButton = new JButton("Edit Campaign");
+		editCampaignButton.setBackground(new Color(165, 108, 51));
+		editCampaignButton.setName("EditCampaign");
+		editCampaignButton.addActionListener(new AddBannerPosListener());
 		showOccupacy = new JButton("Show Occupacy");
-		showOccupacy.setBackground(new Color(165, 108, 51));
+		showOccupacy.setBackground(new Color(143, 71, 0));
 		showOccupacy.setName("ShowOccupacyButton");
 		showOccupacy.addActionListener(new ShowOccupacyListener());
 		settingsButton = new JButton("Settings");
@@ -72,8 +72,8 @@ public class MainMenuModule {
 
 		
 		mainFrame.add(addCampaign);
+		mainFrame.add(editCampaignButton);
 		mainFrame.add(showOccupacy);
-		mainFrame.add(addBannerPosition);
 		mainFrame.add(settingsButton);
 		mainFrame.add(closeButton);
 		mainFrame.setVisible(true);

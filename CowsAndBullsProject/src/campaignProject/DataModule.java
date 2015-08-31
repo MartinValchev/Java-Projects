@@ -17,8 +17,10 @@ import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -31,9 +33,10 @@ public class DataModule extends JPanel
     private static final String addString = "Add";
     private static final String removeString = "Remove";
     private JButton removeButton;
-    private JTextField employeeName;
+    private JTextField propertyName;
     private JLabel nameModule;
-
+    private ArrayList<String> valuesEntered;
+    
     public DataModule(String newNameModule) {
         super(new BorderLayout());
         nameModule = new JLabel(newNameModule);
@@ -41,6 +44,7 @@ public class DataModule extends JPanel
         nameModulePanel.add(nameModule, BorderLayout.CENTER);
         nameModulePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         listModel = new DefaultListModel();
+        valuesEntered = new ArrayList<String>();
         // if some values are needed
        // listModel.addElement("Jane Doe");
        // listModel.addElement("John Smith");
@@ -64,9 +68,9 @@ public class DataModule extends JPanel
         removeButton.setActionCommand(removeString);
         removeButton.addActionListener(new FireListener());
 
-        employeeName = new JTextField(10);
-        employeeName.addActionListener(hireListener);
-        employeeName.getDocument().addDocumentListener(hireListener);
+        propertyName = new JTextField(10);
+        propertyName.addActionListener(hireListener);
+        propertyName.getDocument().addDocumentListener(hireListener);
         //String name = listModel.getElementAt(
                               //list.getSelectedIndex()).toString();
 
@@ -78,14 +82,19 @@ public class DataModule extends JPanel
         buttonPane.add(Box.createHorizontalStrut(5));
         buttonPane.add(new JSeparator(SwingConstants.VERTICAL));
         buttonPane.add(Box.createHorizontalStrut(5));
-        buttonPane.add(employeeName);
+        buttonPane.add(propertyName);
         buttonPane.add(addButton);
         buttonPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         add(nameModulePanel,BorderLayout.NORTH);
         add(listScrollPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
     }
-
+    public ArrayList<String> getEnteredValues(){
+    	for (int i = 0; i < listModel.size(); i++) {
+    		valuesEntered.add(listModel.getElementAt(i).toString());
+		}
+    	return valuesEntered;
+    }
     class FireListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             //This method can be called only if
@@ -93,7 +102,6 @@ public class DataModule extends JPanel
             //so go ahead and remove whatever's selected.
             int index = list.getSelectedIndex();
             listModel.remove(index);
-
             int size = listModel.getSize();
 
             if (size == 0) { //Nobody's left, disable firing.
@@ -107,6 +115,7 @@ public class DataModule extends JPanel
 
                 list.setSelectedIndex(index);
                 list.ensureIndexIsVisible(index);
+               
             }
         }
     }
@@ -122,13 +131,13 @@ public class DataModule extends JPanel
 
         //Required by ActionListener.
         public void actionPerformed(ActionEvent e) {
-            String name = employeeName.getText();
+            String name = propertyName.getText();
 
             //User didn't type in a unique name...
             if (name.equals("") || alreadyInList(name)) {
                 Toolkit.getDefaultToolkit().beep();
-                employeeName.requestFocusInWindow();
-                employeeName.selectAll();
+                propertyName.requestFocusInWindow();
+                propertyName.selectAll();
                 return;
             }
 
@@ -138,14 +147,13 @@ public class DataModule extends JPanel
             } else {           //add after the selected item
                 index++;
             }
-
-            listModel.insertElementAt(employeeName.getText(), index);
+              listModel.insertElementAt(propertyName.getText(), index);
             //If we just wanted to add to the end, we'd do this:
             //listModel.addElement(employeeName.getText());
 
             //Reset the text field.
-            employeeName.requestFocusInWindow();
-            employeeName.setText("");
+            propertyName.requestFocusInWindow();
+            propertyName.setText("");
 
             //Select the new item and make it visible.
             list.setSelectedIndex(index);
