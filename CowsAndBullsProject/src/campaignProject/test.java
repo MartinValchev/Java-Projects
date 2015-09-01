@@ -18,9 +18,12 @@ public class test {
 	}
 
 	public static void main(String[] args) {
-		//CampaignModule test = new CampaignModule("HELLO");
-		//MainMenuModule menu = new MainMenuModule();
-		GeneralSettingsModule set = new GeneralSettingsModule();
+		//CampaignModule test = new CampaignModule();
+		//test.generateGUI();
+		//EditCampaignModule edit = new EditCampaignModule();
+		//edit.createGui();
+		MainMenuModule menu = new MainMenuModule();
+		//GeneralSettingsModule set = new GeneralSettingsModule();
 		// date.getDates("start");
 		// date.getDates("end");
 		// System.out.println(date.getDates("start"));

@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class CampaignModule {
@@ -23,6 +24,7 @@ public class CampaignModule {
 	private JTextField campNameField;
 	private JTextField startDateField;
 	private JTextField endDateField;
+	private JPanel content;
 	//JTextField positionField;
 	private JTextField impressionsField;
 	private Container infoCont;
@@ -36,14 +38,16 @@ public class CampaignModule {
 	private String[] positionStrings;
 	private JComboBox positionList;
 	private CampaignPosModule positionModule;
-	public CampaignModule(String newCampName) {
-		campFrame= new JFrame("Campaign Module");
+	public CampaignModule() {
+		/*campFrame= new JFrame("Campaign Module");
 		campFrame.setSize(370, 340);
 		campFrame.setResizable(false);
 		campFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		campFrame.setLayout(new BorderLayout());
-		windowName = new JLabel("Add Campaign");
-		campaignName = newCampName;
+		campFrame.setLayout(new BorderLayout()); */
+		content = new JPanel();
+		content.setLayout(new BorderLayout());
+		windowName = new JLabel("Campaign");
+		campaignName = "";
 		campDetails = new Container();
 		infoCont = new Container();
 		posDetails = new Container();
@@ -71,10 +75,21 @@ public class CampaignModule {
 		infoCont.add(campDetails);
 		infoCont.add(posDetails);
 		submitButton = new JButton("Submit");
-		campFrame.add(windowName,BorderLayout.NORTH);
-		campFrame.add(infoCont,BorderLayout.CENTER);
-		campFrame.add(submitButton,BorderLayout.SOUTH);
+		content.add(windowName,BorderLayout.NORTH);
+		content.add(infoCont,BorderLayout.CENTER);
+		content.add(submitButton,BorderLayout.SOUTH);
+		
+	}
+	public JPanel getContent(){
+		return content;
+	}
+	public void generateGUI(){
+		campFrame= new JFrame("Campaign Module");
+		campFrame.setSize(370, 340);
+		campFrame.setLocation(410,0);
+		campFrame.setResizable(false);
+		campFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		campFrame.getContentPane().add(content);
 		campFrame.setVisible(true);
 	}
-
 }

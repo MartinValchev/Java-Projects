@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -28,6 +29,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
 
 import campaignProject.CampaignPosModule.AddListener;
 import campaignProject.CampaignPosModule.RemoveListener;
@@ -49,14 +51,19 @@ public class GeneralSettingsModule {
 	private JTextField positionsField;
 	private JLabel separator;
 	private String[] positionStrings;
-	
+	private StringBuilder builder;
+	private String errorMessage = "Position or impressions field is empty";
+	private String name;
+
 	public GeneralSettingsModule() {
-		settingsFrame= new JFrame("General Settings");
+		settingsFrame = new JFrame("General Settings");
 		settingsFrame.setSize(350, 250);
 		settingsFrame.setResizable(false);
+		settingsFrame.setLocation(410, 0);
 		settingsFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		settingsFrame.setLayout(new BorderLayout());
 		limitCont = new Container();
+		builder = new StringBuilder();
 		limitCont.setLayout(new FlowLayout());
 		windowNameLabel = new JLabel("General Settings");
 
@@ -64,28 +71,29 @@ public class GeneralSettingsModule {
 		Box verticalBox = Box.createVerticalBox();
 		verticalBox.add(createPositionPanel());
 
-		///
+		// /
 		saveSettings = new JButton("Save settings");
-		settingsFrame.getContentPane().add(windowNameLabel,BorderLayout.NORTH);
-		settingsFrame.getContentPane().add(verticalBox,BorderLayout.CENTER);
+		settingsFrame.getContentPane().add(windowNameLabel, BorderLayout.NORTH);
+		settingsFrame.getContentPane().add(verticalBox, BorderLayout.CENTER);
 		settingsFrame.getContentPane().add(saveSettings, BorderLayout.SOUTH);
 		settingsFrame.setVisible(true);
 	}
-	public JPanel createPositionPanel(){
+
+	public JPanel createPositionPanel() {
 		JPanel positionPanel = new JPanel();
 		listModel = new DefaultListModel();
-		//listModel.addElement("5000 - Position 1			");
-		//listModel.addElement("4000 - Position 2			");
-		//listModel.addElement("3000 - Position 3			");
-		//listModel.addElement("5000 - Position 4			");
+		// listModel.addElement("5000 - Position 1			");
+		// listModel.addElement("4000 - Position 2			");
+		// listModel.addElement("3000 - Position 3			");
+		// listModel.addElement("5000 - Position 4			");
 		list = new JList(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
-		//list.addListSelectionListener(new AddListener);
+		// list.addListSelectionListener(new AddListener);
 		list.setFixedCellWidth(330);
 		list.setVisibleRowCount(7);
 		JScrollPane listScrollPane = new JScrollPane(list);
-		listScrollPane.setSize(new Dimension(330,200));
+		listScrollPane.setSize(new Dimension(330, 200));
 		//
 
 		//
@@ -103,8 +111,10 @@ public class GeneralSettingsModule {
 		impressionsField.setText("impres. max");
 		impressionsField.addActionListener(addListener);
 		impressionsField.getDocument().addDocumentListener(addListener);
-		positionsField = new JTextField(12); 
+		positionsField = new JTextField(12);
+		positionsField.getDocument().addDocumentListener(addListener);
 		positionsField.setText("Position Name");
+		
 		//
 		separator = new JLabel(" / ");
 		//
@@ -123,7 +133,8 @@ public class GeneralSettingsModule {
 		positionPanel.add(listScrollPane, BorderLayout.CENTER);
 		return positionPanel;
 
-}
+	}
+
 	public class AddListener implements ActionListener, DocumentListener {
 		private boolean alreadyEnabled = false;
 		private JButton button;
@@ -133,39 +144,111 @@ public class GeneralSettingsModule {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+		public void actionPerformed(ActionEvent e) {
+			builder.append(impressionsField.getText());
+			builder.append(" / ");
+			builder.append(positionsField.getText());
+			name = builder.toString();
+			// User didn't type in a unique name...
+			if (name.equals("") || alreadyInList(name)) {
+				positionsField.requestFocusInWindow();
+				positionsField.selectAll();
+				return;
+			}
+			if (impressionsField.getText().isEmpty()
+					|| positionsField.getText().isEmpty()) {
+				JOptionPane
+						.showMessageDialog(null, errorMessage,
+								"Settings input error",
+								JOptionPane.ERROR_MESSAGE, null);
+				impressionsField.setText("");
+				positionsField.setText("");
+			} else {
+				listModel.addElement(name);
+				builder.setLength(0);
+			}
 
+		}
+
+		protected boolean alreadyInList(String name) {
+			return listModel.contains(name);
 		}
 
 		@Override
-		public void changedUpdate(DocumentEvent arg0) {
-			// TODO Auto-generated method stub
+		// Required by DocumentListener.
+		public void insertUpdate(DocumentEvent e) {
+			enableButton();
+		}
+
+		// Required by DocumentListener.
+		public void removeUpdate(DocumentEvent e) {
+			handleEmptyTextField(e);
+		}
+
+		// Required by DocumentListener.
+		public void changedUpdate(DocumentEvent e) {
+			if (!handleEmptyTextField(e)) {
+				enableButton();
+			}
+		}
+
+		private void enableButton() {
+			if (!alreadyEnabled) {
+				button.setEnabled(true);
+			}
+		}
+
+		private boolean handleEmptyTextField(DocumentEvent e) {
+			if (e.getDocument().getLength() <= 0) {
+				button.setEnabled(false);
+				alreadyEnabled = false;
+				return true;
+			}
+			return false;
+		}
+
+		// This method is required by ListSelectionListener.
+		public void valueChanged(ListSelectionEvent e) {
+			if (e.getValueIsAdjusting() == false) {
+
+				if (list.getSelectedIndex() == -1) {
+					// No selection, disable fire button.
+					removeButton.setEnabled(false);
+
+				} else {
+					// Selection, enable the fire button.
+					removeButton.setEnabled(true);
+				}
+			}
 
 		}
 
-		@Override
-		public void insertUpdate(DocumentEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void removeUpdate(DocumentEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
-
+		
 	}
-
 	public class RemoveListener implements ActionListener {
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-
-		}
+		 public void actionPerformed(ActionEvent e) {
+	            //This method can be called only if
+	            //there's a valid selection
+	            //so go ahead and remove whatever's selected.
+	            int index = list.getSelectedIndex();
+	            listModel.remove(index);
+	 
+	            int size = listModel.getSize();
+	 
+	            if (size == 0) { //Nobody's left, disable firing.
+	                removeButton.setEnabled(false);
+	 
+	            } else { //Select an index.
+	                if (index == listModel.getSize()) {
+	                    //removed item in last position
+	                    index--;
+	                }
+	 
+	                list.setSelectedIndex(index);
+	                list.ensureIndexIsVisible(index);
+	            }
+	        }
 
 	}
 }
-

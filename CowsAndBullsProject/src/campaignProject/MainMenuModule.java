@@ -56,7 +56,7 @@ public class MainMenuModule {
 		editCampaignButton = new JButton("Edit Campaign");
 		editCampaignButton.setBackground(new Color(165, 108, 51));
 		editCampaignButton.setName("EditCampaign");
-		editCampaignButton.addActionListener(new AddBannerPosListener());
+		editCampaignButton.addActionListener(new EditCampaignListener());
 		showOccupacy = new JButton("Show Occupacy");
 		showOccupacy.setBackground(new Color(143, 71, 0));
 		showOccupacy.setName("ShowOccupacyButton");
@@ -81,16 +81,18 @@ public class MainMenuModule {
 	public class AddCampaingListener implements ActionListener{
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			
+		public void actionPerformed(ActionEvent e) {
+			CampaignModule newCampaign = new CampaignModule();
+			newCampaign.generateGUI();
 		}
 		
 	}
-	public class AddBannerPosListener implements ActionListener{
+	public class EditCampaignListener implements ActionListener{
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+		public void actionPerformed(ActionEvent e) {
+			EditCampaignModule editCampaign = new EditCampaignModule();
+			editCampaign.createGui();
 			
 		}
 		
@@ -107,17 +109,17 @@ public class MainMenuModule {
 	public class SettingsListener implements ActionListener{
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			
+		public void actionPerformed(ActionEvent e) {
+			GeneralSettingsModule settings = new GeneralSettingsModule();
 		}
 		
 	}
 	public class CloseProgramListener implements ActionListener{
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+		public void actionPerformed(ActionEvent e) {
+			mainFrame.setVisible(false);
+			mainFrame = null;
 			
 		}
 		
