@@ -52,8 +52,9 @@ public class GeneralSettingsModule {
 	private JLabel separator;
 	private String[] positionStrings;
 	private StringBuilder builder;
-	private String errorMessage = "Position or impressions field is empty";
+	private String errorMessage = "impressions field does not contain valid number";
 	private String name;
+	private TestValidInput checkInput;
 
 	public GeneralSettingsModule() {
 		settingsFrame = new JFrame("General Settings");
@@ -66,7 +67,7 @@ public class GeneralSettingsModule {
 		builder = new StringBuilder();
 		limitCont.setLayout(new FlowLayout());
 		windowNameLabel = new JLabel("General Settings");
-
+		checkInput = new TestValidInput();
 		// adding elements to infoCont
 		Box verticalBox = Box.createVerticalBox();
 		verticalBox.add(createPositionPanel());
@@ -78,7 +79,9 @@ public class GeneralSettingsModule {
 		settingsFrame.getContentPane().add(saveSettings, BorderLayout.SOUTH);
 		settingsFrame.setVisible(true);
 	}
-
+	public void takeDatabaseData(){
+		
+	}
 	public JPanel createPositionPanel() {
 		JPanel positionPanel = new JPanel();
 		listModel = new DefaultListModel();
@@ -108,13 +111,13 @@ public class GeneralSettingsModule {
 		removeButton.addActionListener(new RemoveListener());
 		//
 		impressionsField = new JTextField(7);
-		impressionsField.setText("impres. max");
+		impressionsField.setText("Impress max");
 		impressionsField.addActionListener(addListener);
 		impressionsField.getDocument().addDocumentListener(addListener);
 		positionsField = new JTextField(12);
 		positionsField.getDocument().addDocumentListener(addListener);
 		positionsField.setText("Position Name");
-		
+
 		//
 		separator = new JLabel(" / ");
 		//
@@ -135,8 +138,13 @@ public class GeneralSettingsModule {
 
 	}
 
+	public String[] getListArray() {
+		String[] positionsLimit = (String[]) listModel.toArray();
+		return positionsLimit;
+	}
+
 	public class AddListener implements ActionListener, DocumentListener {
-		private boolean alreadyEnabled = false;
+		protected boolean alreadyEnabled = false;
 		private JButton button;
 
 		public AddListener(JButton button) {
@@ -155,27 +163,26 @@ public class GeneralSettingsModule {
 				positionsField.selectAll();
 				return;
 			}
-			if (impressionsField.getText().isEmpty()
-					|| positionsField.getText().isEmpty()) {
-				JOptionPane
-						.showMessageDialog(null, errorMessage,
-								"Settings input error",
-								JOptionPane.ERROR_MESSAGE, null);
-				impressionsField.setText("");
-				positionsField.setText("");
-			} else {
-				listModel.addElement(name);
+			
+				if (checkInput.checkSettingsInput(name)) {
+					listModel.addElement(name);
+				}
+				else{
+					JOptionPane
+					.showMessageDialog(null, errorMessage,
+							"Settings input error",
+							JOptionPane.ERROR_MESSAGE, null);
+					impressionsField.setText("");
+					builder.setLength(0);
+				}
 				builder.setLength(0);
-			}
 
-		}
+			}
 
 		protected boolean alreadyInList(String name) {
 			return listModel.contains(name);
 		}
 
-		@Override
-		// Required by DocumentListener.
 		public void insertUpdate(DocumentEvent e) {
 			enableButton();
 		}
@@ -206,7 +213,7 @@ public class GeneralSettingsModule {
 			}
 			return false;
 		}
-
+	
 		// This method is required by ListSelectionListener.
 		public void valueChanged(ListSelectionEvent e) {
 			if (e.getValueIsAdjusting() == false) {
@@ -223,32 +230,32 @@ public class GeneralSettingsModule {
 
 		}
 
-		
 	}
+
 	public class RemoveListener implements ActionListener {
 
-		 public void actionPerformed(ActionEvent e) {
-	            //This method can be called only if
-	            //there's a valid selection
-	            //so go ahead and remove whatever's selected.
-	            int index = list.getSelectedIndex();
-	            listModel.remove(index);
-	 
-	            int size = listModel.getSize();
-	 
-	            if (size == 0) { //Nobody's left, disable firing.
-	                removeButton.setEnabled(false);
-	 
-	            } else { //Select an index.
-	                if (index == listModel.getSize()) {
-	                    //removed item in last position
-	                    index--;
-	                }
-	 
-	                list.setSelectedIndex(index);
-	                list.ensureIndexIsVisible(index);
-	            }
-	        }
+		public void actionPerformed(ActionEvent e) {
+			// This method can be called only if
+			// there's a valid selection
+			// so go ahead and remove whatever's selected.
+			int index = list.getSelectedIndex();
+			listModel.remove(index);
+
+			int size = listModel.getSize();
+
+			if (size == 0) { // Nobody's left, disable firing.
+				removeButton.setEnabled(false);
+
+			} else { // Select an index.
+				if (index == listModel.getSize()) {
+					// removed item in last position
+					index--;
+				}
+
+				list.setSelectedIndex(index);
+				list.ensureIndexIsVisible(index);
+			}
+		}
 
 	}
 }
