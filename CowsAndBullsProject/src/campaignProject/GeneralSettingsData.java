@@ -7,44 +7,52 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 public class GeneralSettingsData {
-	private ArrayList<String> positionsList;
-	private ArrayList<String> websitesList;
-	private int websitePosLimit;
-	public GeneralSettingsData(DataModule position,DataModule website) {
-		positionsList = position.getEnteredValues(); 
-		websitesList = website.getEnteredValues();
+	// will be used to get data from settings database
+	// send the new changes to the settings database
+	// check userInput;
+	private TestValidInput checkInput;
+	private CommandBuffer commandBuffer;
+	private String errorMessage = "impressions field does not contain valid number";
+	private SettingsDatabaseConnection databaseConnection;
+
+	public GeneralSettingsData() {
+		checkInput = new TestValidInput();
+		commandBuffer = new CommandBuffer();
+		databaseConnection = new SettingsDatabaseConnection();
 	}
 
-	public void readFiles(File fileName) {
-		// File one = new File("C:\\Users\\martin\\Desktop\\hubAccounts.txt");
-		Path currentPath = fileName.toPath();
-		Charset charset = Charset.forName("UTF-8");
-		try (BufferedReader reader = Files.newBufferedReader(currentPath,
-				charset)) {
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
+	public boolean validateInput(String inputToCheck) {
+		if (checkInput.checkSettingsInput(inputToCheck)) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public void pushToCommandBuffer(String command) {
+		commandBuffer.addToQueue(command);
+	}
+	public void sendCommandsToDatabase() throws ClassNotFoundException{
+		commandBuffer.callSettingsCommands();
+	}
+	public void pullSettingsFromDatabase(GeneralSettingsModule settingsModule){
+		try {
+			ArrayList<String> positionRecords = new ArrayList<String>();
+			positionRecords = databaseConnection.pullFromSettingsDatabase();
+			for (String element:positionRecords){
+				settingsModule.getListModel().addElement(element);
 			}
-		} catch (IOException x) {
-			System.err.format("IOException: %s%n", x);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println("No connection to the database");
 		}
-	}
-
-	public void writeFiles(File fileName, String input) {
-		Charset charset = Charset.forName("US-ASCII");
-		Path currentPath = fileName.toPath();
-		try (BufferedWriter writer = Files.newBufferedWriter(currentPath,
-				charset)) {
-			writer.write(input, 0, input.length());
-		} catch (IOException x) {
-			System.err.format("IOException: %s%n", x);
-		}
-	}
-	public void setWebsites(){
-		
 	}
 }

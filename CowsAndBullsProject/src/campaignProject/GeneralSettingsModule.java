@@ -53,8 +53,8 @@ public class GeneralSettingsModule {
 	private String[] positionStrings;
 	private StringBuilder builder;
 	private String errorMessage = "impressions field does not contain valid number";
-	private String name;
-	private TestValidInput checkInput;
+	private String positionRecord;
+	private GeneralSettingsData settingsData;
 
 	public GeneralSettingsModule() {
 		settingsFrame = new JFrame("General Settings");
@@ -67,20 +67,24 @@ public class GeneralSettingsModule {
 		builder = new StringBuilder();
 		limitCont.setLayout(new FlowLayout());
 		windowNameLabel = new JLabel("General Settings");
-		checkInput = new TestValidInput();
+		settingsData = new GeneralSettingsData();
 		// adding elements to infoCont
 		Box verticalBox = Box.createVerticalBox();
 		verticalBox.add(createPositionPanel());
 
 		// /
 		saveSettings = new JButton("Save settings");
+		saveSettings.addActionListener(new SaveSettingsListener());
 		settingsFrame.getContentPane().add(windowNameLabel, BorderLayout.NORTH);
 		settingsFrame.getContentPane().add(verticalBox, BorderLayout.CENTER);
 		settingsFrame.getContentPane().add(saveSettings, BorderLayout.SOUTH);
 		settingsFrame.setVisible(true);
 	}
-	public void takeDatabaseData(){
-		
+	public String getPositionRecord(){
+		return positionRecord;
+	}
+	public DefaultListModel getListModel(){
+		return listModel;
 	}
 	public JPanel createPositionPanel() {
 		JPanel positionPanel = new JPanel();
@@ -95,6 +99,7 @@ public class GeneralSettingsModule {
 		// list.addListSelectionListener(new AddListener);
 		list.setFixedCellWidth(330);
 		list.setVisibleRowCount(7);
+		settingsData.pullSettingsFromDatabase(this);
 		JScrollPane listScrollPane = new JScrollPane(list);
 		listScrollPane.setSize(new Dimension(330, 200));
 		//
@@ -153,19 +158,24 @@ public class GeneralSettingsModule {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			
 			builder.append(impressionsField.getText());
 			builder.append(" / ");
 			builder.append(positionsField.getText());
-			name = builder.toString();
+			positionRecord = builder.toString();
 			// User didn't type in a unique name...
-			if (name.equals("") || alreadyInList(name)) {
+			if (positionRecord.equals("") || alreadyInList(positionRecord)) {
 				positionsField.requestFocusInWindow();
 				positionsField.selectAll();
 				return;
 			}
 			
-				if (checkInput.checkSettingsInput(name)) {
-					listModel.addElement(name);
+				if (settingsData.validateInput(positionRecord)) {
+					listModel.addElement(positionRecord);
+					builder.append("/");
+					builder.append("ADDSettings");
+					// send the command to commandQueue
+					settingsData.pushToCommandBuffer(builder.toString());
 				}
 				else{
 					JOptionPane
@@ -239,6 +249,10 @@ public class GeneralSettingsModule {
 			// there's a valid selection
 			// so go ahead and remove whatever's selected.
 			int index = list.getSelectedIndex();
+			builder.append(list.getSelectedValue());
+			builder.append("/");
+			builder.append("DELSettings");
+			settingsData.pushToCommandBuffer(builder.toString());
 			listModel.remove(index);
 
 			int size = listModel.getSize();
@@ -258,4 +272,22 @@ public class GeneralSettingsModule {
 		}
 
 	}
+	public class SaveSettingsListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				settingsData.sendCommandsToDatabase();
+				// close window
+				settingsFrame.setVisible(false);
+				settingsFrame = null;
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		}
+		
+	}
 }
+
