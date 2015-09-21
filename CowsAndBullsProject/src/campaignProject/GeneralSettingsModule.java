@@ -55,6 +55,7 @@ public class GeneralSettingsModule {
 	private String errorMessage = "impressions field does not contain valid number";
 	private String positionRecord;
 	private GeneralSettingsData settingsData;
+	private static final char DELIMITER = '-';
 
 	public GeneralSettingsModule() {
 		settingsFrame = new JFrame("General Settings");
@@ -99,7 +100,7 @@ public class GeneralSettingsModule {
 		// list.addListSelectionListener(new AddListener);
 		list.setFixedCellWidth(330);
 		list.setVisibleRowCount(7);
-		settingsData.pullSettingsFromDatabase(this);
+		settingsData.pullSettingsFromTable(this);
 		JScrollPane listScrollPane = new JScrollPane(list);
 		listScrollPane.setSize(new Dimension(330, 200));
 		//
@@ -160,7 +161,7 @@ public class GeneralSettingsModule {
 		public void actionPerformed(ActionEvent e) {
 			
 			builder.append(impressionsField.getText());
-			builder.append(" / ");
+			builder.append(DELIMITER);
 			builder.append(positionsField.getText());
 			positionRecord = builder.toString();
 			// User didn't type in a unique name...
@@ -172,7 +173,7 @@ public class GeneralSettingsModule {
 			
 				if (settingsData.validateInput(positionRecord)) {
 					listModel.addElement(positionRecord);
-					builder.append("/");
+					builder.append(DELIMITER);
 					builder.append("ADDSettings");
 					// send the command to commandQueue
 					settingsData.pushToCommandBuffer(builder.toString());
@@ -248,9 +249,15 @@ public class GeneralSettingsModule {
 			// This method can be called only if
 			// there's a valid selection
 			// so go ahead and remove whatever's selected.
+			/*
+			 builder.append(impressionsField.getText());
+			builder.append(" / ");
+			builder.append(positionsField.getText());
+			positionRecord = builder.toString();
+			 */
 			int index = list.getSelectedIndex();
 			builder.append(list.getSelectedValue());
-			builder.append("/");
+			builder.append(DELIMITER);
 			builder.append("DELSettings");
 			settingsData.pushToCommandBuffer(builder.toString());
 			listModel.remove(index);

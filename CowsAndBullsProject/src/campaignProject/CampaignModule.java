@@ -22,8 +22,12 @@ public class CampaignModule {
 	private JLabel startDateLabel;
 	private JLabel endDateLabel;
 	private JTextField campNameField;
-	private JTextField startDateField;
-	private JTextField endDateField;
+
+	// JPanel initialize
+	JPanel campStartDate;
+	JPanel campEndDate;
+	JPanel posStartDate;
+	JPanel posEndDate;
 	private JPanel content;
 	//JTextField positionField;
 	private JTextField impressionsField;
@@ -38,12 +42,20 @@ public class CampaignModule {
 	private String[] positionStrings;
 	private JComboBox positionList;
 	private CampaignPosModule positionModule;
+	private DatePicker campStartDatePicker;
+	private DatePicker campEndDatePicker;
+
 	public CampaignModule() {
 		/*campFrame= new JFrame("Campaign Module");
 		campFrame.setSize(370, 340);
 		campFrame.setResizable(false);
 		campFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		campFrame.setLayout(new BorderLayout()); */
+		// datePicker initialize
+		campStartDatePicker = new DatePicker();
+		campEndDatePicker  = new DatePicker();
+		campStartDate = campStartDatePicker.getDatesPanel();
+		campEndDate = campEndDatePicker.getDatesPanel();
 		content = new JPanel();
 		content.setLayout(new BorderLayout());
 		windowName = new JLabel("Campaign");
@@ -60,36 +72,40 @@ public class CampaignModule {
 		endDateLabel = new JLabel("Campaign End Date: ");
 		// TextField initialize
 		campNameField = new JTextField(20);
-		startDateField = new JTextField(10);
-		endDateField = new JTextField(10);
 		// Position Module initialize
-		positionModule = new CampaignPosModule();
+		
 		// Container adding
 		campDetails.add(campNameLabel);
 		campDetails.add(campNameField);
 		campDetails.add(startDateLabel);
-		campDetails.add(startDateField);
+		campDetails.add(campStartDate);
 		campDetails.add(endDateLabel);
-		campDetails.add(endDateField);
-		posDetails.add(positionModule);
+		campDetails.add(campEndDate);
 		infoCont.add(campDetails);
-		infoCont.add(posDetails);
 		submitButton = new JButton("Submit");
 		content.add(windowName,BorderLayout.NORTH);
 		content.add(infoCont,BorderLayout.CENTER);
 		content.add(submitButton,BorderLayout.SOUTH);
+		positionModule = new CampaignPosModule();
+		posDetails.add(positionModule);
+		infoCont.add(posDetails);
 		
 	}
 	public JPanel getContent(){
 		return content;
 	}
+	public String getCampaignName(){
+		return campNameField.getText();
+	}
+
 	public void generateGUI(){
 		campFrame= new JFrame("Campaign Module");
-		campFrame.setSize(370, 340);
+		campFrame.setSize(410, 450);
 		campFrame.setLocation(410,0);
 		campFrame.setResizable(false);
 		campFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		campFrame.getContentPane().add(content);
 		campFrame.setVisible(true);
 	}
+
 }

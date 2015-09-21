@@ -18,14 +18,14 @@ public class GeneralSettingsData {
 	// send the new changes to the settings database
 	// check userInput;
 	private TestValidInput checkInput;
-	private CommandBuffer commandBuffer;
+	private SettingsCommandBuffer commandBuffer;
 	private String errorMessage = "impressions field does not contain valid number";
-	private SettingsDatabaseConnection databaseConnection;
+	private DatabaseConnection databaseConnection;
 
 	public GeneralSettingsData() {
 		checkInput = new TestValidInput();
-		commandBuffer = new CommandBuffer();
-		databaseConnection = new SettingsDatabaseConnection();
+		commandBuffer = new SettingsCommandBuffer();
+		databaseConnection = new DatabaseConnection();
 	}
 
 	public boolean validateInput(String inputToCheck) {
@@ -36,17 +36,17 @@ public class GeneralSettingsData {
 		}
 
 	}
-
+	
 	public void pushToCommandBuffer(String command) {
 		commandBuffer.addToQueue(command);
 	}
 	public void sendCommandsToDatabase() throws ClassNotFoundException{
 		commandBuffer.callSettingsCommands();
 	}
-	public void pullSettingsFromDatabase(GeneralSettingsModule settingsModule){
+	public void pullSettingsFromTable(GeneralSettingsModule settingsModule){
 		try {
 			ArrayList<String> positionRecords = new ArrayList<String>();
-			positionRecords = databaseConnection.pullFromSettingsDatabase();
+			positionRecords = databaseConnection.pullFromSettingsTable();
 			for (String element:positionRecords){
 				settingsModule.getListModel().addElement(element);
 			}
