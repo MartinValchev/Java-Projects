@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 public class GeneralSettingsData {
@@ -21,11 +24,27 @@ public class GeneralSettingsData {
 	private SettingsCommandBuffer commandBuffer;
 	private String errorMessage = "impressions field does not contain valid number";
 	private DatabaseConnection databaseConnection;
+	private int[] maxImpressions;
+	private String[] positionName;
+	private ArrayList<Integer> impressionsList;
+	private ArrayList<String> positionList;
+	private String separator = "-";
+	private String[] positionArr;
+	private int[] impressionsArr;
+	private ArrayList<PositionTableRecord> addList;
+	private ArrayList<PositionTableRecord> removeList;
+	private ArrayList<PositionTableRecord> posList;
+	private PositionManipulator positionManipulator;
 
-	public GeneralSettingsData() {
+	public GeneralSettingsData() throws SQLException {
 		checkInput = new TestValidInput();
 		commandBuffer = new SettingsCommandBuffer();
 		databaseConnection = new DatabaseConnection();
+		addList = new ArrayList<PositionTableRecord>();
+		removeList = new ArrayList<PositionTableRecord>();
+		positionManipulator = new PositionManipulator();
+		posList = new ArrayList<PositionTableRecord>();
+		posList = databaseConnection.pullFromPositionTable();
 	}
 
 	public boolean validateInput(String inputToCheck) {
@@ -36,23 +55,55 @@ public class GeneralSettingsData {
 		}
 
 	}
-	
-	public void pushToCommandBuffer(String command) {
-		commandBuffer.addToQueue(command);
-	}
-	public void sendCommandsToDatabase() throws ClassNotFoundException{
-		commandBuffer.callSettingsCommands();
-	}
-	public void pullSettingsFromTable(GeneralSettingsModule settingsModule){
-		try {
-			ArrayList<String> positionRecords = new ArrayList<String>();
-			positionRecords = databaseConnection.pullFromSettingsTable();
-			for (String element:positionRecords){
-				settingsModule.getListModel().addElement(element);
+
+	public void sortCommandList(ArrayList<PositionTableRecord> currentCommandsList,
+			ArrayList<PositionTableRecord> newCommandsList) {
+		boolean isFound = false;
+		removeList = new ArrayList<PositionTableRecord>();
+		addList = new ArrayList<PositionTableRecord>();
+		for (int index = 0; index < newCommandsList.size(); index++) {
+			isFound = false;
+			for (int current = 0; current < currentCommandsList.size(); current++) {
+				if (newCommandsList.get(index).getPostionRecord()
+						.equals(currentCommandsList.get(current).getPostionRecord())) {
+					isFound = true;
+					newCommandsList.remove(index);
+					index--;
+					currentCommandsList.remove(current);
+					break;
+				}
+
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("No connection to the database");
+			if (!isFound) {
+				addList.add(newCommandsList.get(index));
+				newCommandsList.remove(index);
+				index--;
+			}
+
+		}
+		if (currentCommandsList.size() > 0 && newCommandsList.size() == 0) {
+			for (int current = 0; current < currentCommandsList.size(); current++) {
+				removeList.add(currentCommandsList.get(current));
+			}
+		}
+
+	}
+
+	public void compareLists(ArrayList<PositionTableRecord> newCommandsList) {
+		sortCommandList(posList, newCommandsList);
+		if (addList.size() > 0) {
+			commandBuffer.callAddSettingsCommands(addList);
+		}
+		if (removeList.size() > 0) {
+			commandBuffer.callRemoveSettingsCommands(positionArr, impressionsArr);
+		}
+
+	}
+
+	public void fillListModel(DefaultListModel<String> listModel) {
+		for (int i = 0; i < posList.size(); i++) {
+			String currentElement = posList.get(i).getPostionRecord();
+			listModel.addElement(currentElement);
 		}
 	}
 }

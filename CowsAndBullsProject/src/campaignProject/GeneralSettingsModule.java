@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
@@ -31,9 +32,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 
-import campaignProject.CampaignPosModule.AddListener;
-import campaignProject.CampaignPosModule.RemoveListener;
-
 public class GeneralSettingsModule {
 	private JFrame settingsFrame;
 	private Container limitCont;
@@ -52,12 +50,15 @@ public class GeneralSettingsModule {
 	private JLabel separator;
 	private String[] positionStrings;
 	private StringBuilder builder;
-	private String errorMessage = "impressions field does not contain valid number";
+	private ArrayList<String> currentSettingsList;
+	private ArrayList<String> newSettingsList;
+	private String numberFormatErrorMessage = "Impressions field does not contain valid number";
+	private String alreadyInListErrorMessage = "The position you are trying to enter is already in the List";
 	private String positionRecord;
 	private GeneralSettingsData settingsData;
-	private static final char DELIMITER = '-';
+	private static final String DELIMITER = " - ";
 
-	public GeneralSettingsModule() {
+	public GeneralSettingsModule() throws SQLException {
 		settingsFrame = new JFrame("General Settings");
 		settingsFrame.setSize(350, 250);
 		settingsFrame.setResizable(false);
@@ -81,26 +82,32 @@ public class GeneralSettingsModule {
 		settingsFrame.getContentPane().add(saveSettings, BorderLayout.SOUTH);
 		settingsFrame.setVisible(true);
 	}
-	public String getPositionRecord(){
+
+	public String getPositionRecord() {
 		return positionRecord;
 	}
-	public DefaultListModel getListModel(){
+
+	public DefaultListModel getListModel() {
 		return listModel;
 	}
+	/*
+	 * public ArrayList<String> ConvertToArrayList() { ArrayList<String> arrList
+	 * = new ArrayList<String>(); for (int i = 0; i < listModel.size(); i++) {
+	 * arrList.add((String) listModel.getElementAt(i)); } return arrList; }
+	 */
+
 	public JPanel createPositionPanel() {
 		JPanel positionPanel = new JPanel();
 		listModel = new DefaultListModel();
-		// listModel.addElement("5000 - Position 1			");
-		// listModel.addElement("4000 - Position 2			");
-		// listModel.addElement("3000 - Position 3			");
-		// listModel.addElement("5000 - Position 4			");
-		list = new JList(listModel);
+		settingsData.fillListModel(listModel);
+		list = new JList<>(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
 		// list.addListSelectionListener(new AddListener);
 		list.setFixedCellWidth(330);
 		list.setVisibleRowCount(7);
-		settingsData.pullSettingsFromTable(this);
+		// settingsData.pullSettingsFromTable(this);
+
 		JScrollPane listScrollPane = new JScrollPane(list);
 		listScrollPane.setSize(new Dimension(330, 200));
 		//
@@ -125,7 +132,7 @@ public class GeneralSettingsModule {
 		positionsField.setText("Position Name");
 
 		//
-		separator = new JLabel(" / ");
+		separator = new JLabel(" - ");
 		//
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -144,9 +151,13 @@ public class GeneralSettingsModule {
 
 	}
 
-	public String[] getListArray() {
-		String[] positionsLimit = (String[]) listModel.toArray();
-		return positionsLimit;
+	public ArrayList<String> getListArray() {
+		ArrayList<String> arrList = new ArrayList<String>();
+		for (int i = 0; i < listModel.size(); i++) {
+			arrList.add((String) listModel.getElementAt(i));
+		}
+
+		return arrList;
 	}
 
 	public class AddListener implements ActionListener, DocumentListener {
@@ -159,36 +170,35 @@ public class GeneralSettingsModule {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			builder.append(impressionsField.getText());
 			builder.append(DELIMITER);
 			builder.append(positionsField.getText());
 			positionRecord = builder.toString();
 			// User didn't type in a unique name...
 			if (positionRecord.equals("") || alreadyInList(positionRecord)) {
+				JOptionPane.showMessageDialog(null, alreadyInListErrorMessage, "Settings input error",
+						JOptionPane.ERROR_MESSAGE, null);
 				positionsField.requestFocusInWindow();
 				positionsField.selectAll();
 				return;
 			}
-			
-				if (settingsData.validateInput(positionRecord)) {
-					listModel.addElement(positionRecord);
-					builder.append(DELIMITER);
-					builder.append("ADDSettings");
-					// send the command to commandQueue
-					settingsData.pushToCommandBuffer(builder.toString());
-				}
-				else{
-					JOptionPane
-					.showMessageDialog(null, errorMessage,
-							"Settings input error",
-							JOptionPane.ERROR_MESSAGE, null);
-					impressionsField.setText("");
-					builder.setLength(0);
-				}
-				builder.setLength(0);
 
+			if (settingsData.validateInput(positionRecord)) {
+				listModel.addElement(positionRecord);
+				builder.append(DELIMITER);
+				positionsField.setText("");
+				impressionsField.setText("");
+				
+			} else {
+				JOptionPane.showMessageDialog(null, numberFormatErrorMessage, "Settings input error",
+						JOptionPane.ERROR_MESSAGE, null);
+				impressionsField.setText("");
+				builder.setLength(0);
 			}
+			builder.setLength(0);
+
+		}
 
 		protected boolean alreadyInList(String name) {
 			return listModel.contains(name);
@@ -224,7 +234,7 @@ public class GeneralSettingsModule {
 			}
 			return false;
 		}
-	
+
 		// This method is required by ListSelectionListener.
 		public void valueChanged(ListSelectionEvent e) {
 			if (e.getValueIsAdjusting() == false) {
@@ -250,16 +260,11 @@ public class GeneralSettingsModule {
 			// there's a valid selection
 			// so go ahead and remove whatever's selected.
 			/*
-			 builder.append(impressionsField.getText());
-			builder.append(" / ");
-			builder.append(positionsField.getText());
-			positionRecord = builder.toString();
+			 * builder.append(impressionsField.getText()); builder.append(" / "
+			 * ); builder.append(positionsField.getText()); positionRecord =
+			 * builder.toString();
 			 */
 			int index = list.getSelectedIndex();
-			builder.append(list.getSelectedValue());
-			builder.append(DELIMITER);
-			builder.append("DELSettings");
-			settingsData.pushToCommandBuffer(builder.toString());
 			listModel.remove(index);
 
 			int size = listModel.getSize();
@@ -279,22 +284,18 @@ public class GeneralSettingsModule {
 		}
 
 	}
-	public class SaveSettingsListener implements ActionListener{
+
+	public class SaveSettingsListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			try {
-				settingsData.sendCommandsToDatabase();
-				// close window
-				settingsFrame.setVisible(false);
-				settingsFrame = null;
-			} catch (ClassNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
+
+			newSettingsList = getListArray();
+			settingsData.compareLists(currentSettingsList, newSettingsList);
+			// close window
+			settingsFrame.setVisible(false);
+			settingsFrame = null;
+
 		}
-		
 	}
 }
-

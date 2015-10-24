@@ -1,6 +1,7 @@
 package campaignProject;
 
 import java.awt.BorderLayout;
+import java.sql.SQLException;
 
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -13,7 +14,7 @@ public class EditCampaignModule {
 	private String[] campaignNames;
 	private JComboBox campNames;
 
-	public EditCampaignModule() {
+	public EditCampaignModule() throws SQLException {
 		camp = new CampaignModule();
 		campaignPanel = new JPanel();
 		campaignPanel = camp.getContent();

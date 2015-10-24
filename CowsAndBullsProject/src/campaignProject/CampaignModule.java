@@ -63,7 +63,7 @@ public class CampaignModule {
 		campDetails = new Container();
 		infoCont = new Container();
 		posDetails = new Container();
-		posDetails.setLayout(new FlowLayout(FlowLayout.CENTER));
+		posDetails.setLayout(new FlowLayout(FlowLayout.LEFT));
 		campDetails.setLayout(new GridLayout(3,2));
 		infoCont.setLayout(new BoxLayout(infoCont, BoxLayout.Y_AXIS));
 		// label initialize
@@ -100,7 +100,7 @@ public class CampaignModule {
 
 	public void generateGUI(){
 		campFrame= new JFrame("Campaign Module");
-		campFrame.setSize(410, 450);
+		campFrame.setSize(500, 450);
 		campFrame.setLocation(410,0);
 		campFrame.setResizable(false);
 		campFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

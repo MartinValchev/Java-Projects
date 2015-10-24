@@ -14,28 +14,40 @@ public class DatabaseConnection {
 	private Statement myStat;
 	private ResultSet myRes;
 	private ArrayList<String> arrayList;
+	private ArrayList<String> settingsPositions;
+	private ArrayList<Integer> impressionLimit;
+	private ArrayList<PositionTableRecord> positionList;
+	private ArrayList<CampaignTableRecord> campaignList;
 	private String dbURL = "jdbc:mysql://localhost:3306/campaignproject";
 	private String user = "root";
 	private String password = "Portal123@";
-	private String addStatement = "INSERT INTO settings_table (Position,ImpressionsLimit)" + "VALUES" + "(?,?)";
+	private DatabaseConnectionStatements statements;
+	private CampaignCash campaignCash;
+	private char delimiter = '-';
 
 	public DatabaseConnection() {
-		myConn = null;
+
+		try {
+			myConn = DriverManager.getConnection(dbURL, user, password);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		myStat = null;
 		myRes = null;
+		positionList = new ArrayList<PositionTableRecord>();
+		campaignList = new ArrayList<CampaignTableRecord>();
+		//
 		arrayList = new ArrayList<String>();
+		statements = new DatabaseConnectionStatements();
+		campaignCash = new CampaignCash();
 	}
 
-	// Settings database
-	public void addToSettingsTable(String newPosition, int impressLimit) throws ClassNotFoundException {
-		myConn = null;
-		myStat = null;
-		myRes = null;
-
-		ResultSet rs = null;
-		try (Connection myConn = DriverManager.getConnection(dbURL, user, password);
-				PreparedStatement stmt = myConn.prepareStatement(addStatement, ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_READ_ONLY);) {
+	// position table
+	public void addToPositionTable(String newPosition, int impressLimit) throws ClassNotFoundException {
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getAddPositionStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
 			stmt.setString(1, newPosition);
 			stmt.setInt(2, impressLimit);
 			stmt.execute();
@@ -46,43 +58,93 @@ public class DatabaseConnection {
 		}
 	}
 
-	public void removeSettingsRecord(String positionName, int impressions) {
-		String delStatement = "delete Position, ImpressionsLimit FROM settings_table "
-				+ "WHERE Position = ? AND ImpressionsLimit = ?";
-
-		try (Connection myConn = DriverManager.getConnection(dbURL, user, password);
-				PreparedStatement stmt = myConn.prepareStatement(delStatement, ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_READ_ONLY);) {
+	public void removePositionRecord(String positionName,Date positionStartDate) {
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getDelPositionStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
 			stmt.setString(1, positionName);
-			stmt.setInt(2, impressions);
 			stmt.execute();
-
+			int positionId = getPositionIdFromName(positionName);
+			removeFromCampaignPositionTable(positionId,positionStartDate);
 		} catch (SQLException e) {
 			System.err.println(e);
 		}
 	}
 
-	public ArrayList<String> pullFromSettingsTable() throws SQLException {
-		Connection myConn = DriverManager.getConnection(dbURL, user, password);
+	public ArrayList<PositionTableRecord> pullFromPositionTable() throws SQLException {
 		Statement myStat = myConn.createStatement();
-		ResultSet myRes = myStat.executeQuery(" select * from settings_table ");
+		ResultSet myRes = myStat.executeQuery(" select * from position ");
 		while (myRes.next()) {
-			arrayList.add(myRes.getString("ImpressionsLimit") + '/' + myRes.getString("Position"));
+			PositionTableRecord currentRecord = new PositionTableRecord(myRes.getString("position_name"),
+					myRes.getInt("impressions_limit"));
+			positionList.add(currentRecord);
 
 		}
-		return arrayList;
+		return positionList;
 	}
-// Campaign Database
+
+	// used for PositionCash
+	public ArrayList<String> getPositionName() {
+		ArrayList<String> positionNameList = new ArrayList<String>();
+		try {
+			ResultSet myRes = myStat.executeQuery(" select position_name from position ");
+			while (myRes.next()) {
+				String current = myRes.getString("position_name");
+				positionNameList.add(current);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return positionNameList;
+	}
+	public ArrayList<String> getCampaignName() {
+		ArrayList<String> campaignNameList = new ArrayList<String>();
+		try {
+			ResultSet myRes = myStat.executeQuery(" select campaign_name from campaign ");
+			while (myRes.next()) {
+				String current = myRes.getString("campaign_name");
+				campaignNameList.add(current);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return campaignNameList;
+	}
+	// used for PositionCash
+	public ArrayList<Integer> getPositionId() {
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		try {
+			ResultSet myRes = myStat.executeQuery(" select id from position ");
+			while (myRes.next()) {
+				int current = myRes.getInt("id");
+				idList.add(current);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return idList;
+	}
+	public ArrayList<Integer> getCampaignId() {
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		try {
+			ResultSet myRes = myStat.executeQuery(" select id from campaign ");
+			while (myRes.next()) {
+				int current = myRes.getInt("id");
+				idList.add(current);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return idList;
+	}
+
 	public void addToCampaignTable(String campaignName, Date campaignStartDate, Date campaignEndDate)
 			throws ClassNotFoundException {
-		myConn = null;
-		myStat = null;
-		myRes = null;
-
-		ResultSet rs = null;
-		try (Connection myConn = DriverManager.getConnection(dbURL, user, password);
-				PreparedStatement stmt = myConn.prepareStatement(addStatement, ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_READ_ONLY);) {
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getAddCampStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
 			stmt.setString(1, campaignName);
 			stmt.setDate(2, campaignStartDate);
 			stmt.setDate(3, campaignEndDate);
@@ -94,15 +156,13 @@ public class DatabaseConnection {
 		}
 	}
 
-	public void removeCampaignRecord(String positionName, Date campaignStartDate) {
-		String delStatement = "delete CampaignName, CampaignStartDate, CampaignEndDate FROM campaign_table "
-				+ "WHERE CampaignName = ? AND CampaignStartDate = ?";
+	public void updateCampaignRecord(String newCampaignName, Date newCampaignStartDate, Date newCampaignEndDate) {
 
-		try (Connection myConn = DriverManager.getConnection(dbURL, user, password);
-				PreparedStatement stmt = myConn.prepareStatement(delStatement, ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_READ_ONLY);) {
-			stmt.setString(1, positionName);
-			stmt.setDate(2, campaignStartDate);
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getUpdateCampStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
+			stmt.setString(1, newCampaignName);
+			stmt.setDate(2, newCampaignStartDate);
+			stmt.setDate(3, newCampaignEndDate);
 			stmt.execute();
 
 		} catch (SQLException e) {
@@ -110,66 +170,85 @@ public class DatabaseConnection {
 		}
 	}
 
-	public ArrayList<String> pullFromCampaignTable() throws SQLException {
-		Connection myConn = DriverManager.getConnection(dbURL, user, password);
+	public ArrayList<CampaignTableRecord> pullFromCampaignTable() throws SQLException {
+
 		Statement myStat = myConn.createStatement();
-		ResultSet myRes = myStat.executeQuery(" select * from campaign_table ");
+		ResultSet myRes = myStat.executeQuery(" select * from campaign ");
 		while (myRes.next()) {
-			arrayList.add(myRes.getString("CampaignName") + '/' + myRes.getDate("CampaignStartDate") + '/'
-					+ myRes.getDate("CampaignEndDate"));
+			CampaignTableRecord campaignRecord = new CampaignTableRecord(myRes.getString("campaign_name"),
+					myRes.getDate("campaign_start_date"), myRes.getDate("campaign_end_date"));
 
+			campaignList.add(campaignRecord);
 		}
-		return arrayList;
+		return campaignList;
 	}
-// Position Database
-	public void addToPositionTable(String campaignName, String position, Date positionStartDate,
-			Date positionEndDate, int dailyImpressions) throws ClassNotFoundException {
-		myConn = null;
-		myStat = null;
-		myRes = null;
 
-		ResultSet rs = null;
-		try (Connection myConn = DriverManager.getConnection(dbURL, user, password);
-				PreparedStatement stmt = myConn.prepareStatement(addStatement, ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_READ_ONLY);) {
+	// Position Database
+
+	public void removeCampaignRecord(String campaignName) {
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getDeleteCampStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
 			stmt.setString(1, campaignName);
-			stmt.setString(2, position);
+			stmt.execute();
+			int campaignId = campaignCash.getCampaignId(campaignName);
+			removeFromCampaignPositionTable(campaignId);
+			
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+	}
+
+	public void addToCampaignPositionTable(int campaignId, int positionId, Date positionStartDate, Date positionEndDate,
+			int dailyImpressions) {
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getAddCampaignPositionStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
+			stmt.setInt(1, campaignId);
+			stmt.setInt(2, positionId);
 			stmt.setDate(3, positionStartDate);
 			stmt.setDate(4, positionEndDate);
 			stmt.setInt(5, dailyImpressions);
 			stmt.execute();
-			// Tours.displayData(rs);
 
 		} catch (SQLException e) {
 			System.err.println(e);
 		}
 	}
-
-	public void removePositionRecord(String positionName, Date startDate) {
-		String delStatement = "delete Position, ImpressionsLimit FROM settings_table "
-				+ "WHERE Position = ? AND PositioStartDate = ?";
-
-		try (Connection myConn = DriverManager.getConnection(dbURL, user, password);
-				PreparedStatement stmt = myConn.prepareStatement(delStatement, ResultSet.TYPE_SCROLL_INSENSITIVE,
-						ResultSet.CONCUR_READ_ONLY);) {
-			stmt.setString(1, positionName);
-			stmt.setDate(2, startDate);
+	public void removeFromCampaignPositionTable(int positionId,Date positionStartDate){
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getDeleteCampaignPositionStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
+			stmt.setInt(1, positionId);
+			stmt.setDate(2, positionStartDate);
 			stmt.execute();
 
 		} catch (SQLException e) {
 			System.err.println(e);
 		}
 	}
+	public void removeFromCampaignPositionTable(int campaignId){
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getDeleteCampaignPositionStatement2(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
+			stmt.setInt(1, campaignId);
+			stmt.execute();
 
-	public ArrayList<String> pullFromPositionTable() throws SQLException {
-		Connection myConn = DriverManager.getConnection(dbURL, user, password);
-		Statement myStat = myConn.createStatement();
-		ResultSet myRes = myStat.executeQuery(" select * from campaign_table ");
-		while (myRes.next()) {
-			arrayList.add(myRes.getString("Position") + '/' + myRes.getDate("PositionStartDate") + '/'
-					+ myRes.getDate("PositionEndDate") + '/' + myRes.getInt("DailyImpressions"));
-
+		} catch (SQLException e) {
+			System.err.println(e);
 		}
-		return arrayList;
 	}
+	public int getPositionIdFromName(String posName){
+		int id = 0;
+		try (PreparedStatement stmt = myConn.prepareStatement(statements.getSelectPositionIdStatement(), ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);) {
+			stmt.setString(1, posName);
+			
+			myRes =stmt.executeQuery(statements.getSelectPositionIdStatement());
+			while(myRes.next()){
+				id = myRes.getInt("id");
+			}
+			return id;
+		} catch (SQLException e) {
+			System.err.println(e);
+		}
+		return -1;
+	}
+
 }

@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -82,8 +83,15 @@ public class MainMenuModule {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CampaignModule newCampaign = new CampaignModule();
-			newCampaign.generateGUI();
+			CampaignModule newCampaign;
+			try {
+				newCampaign = new CampaignModule();
+				newCampaign.generateGUI();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
 		}
 		
 	}
@@ -91,8 +99,16 @@ public class MainMenuModule {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			EditCampaignModule editCampaign = new EditCampaignModule();
-			editCampaign.createGui();
+			
+			try {
+				EditCampaignModule editCampaign;
+				editCampaign = new EditCampaignModule();
+				editCampaign.createGui();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
 			
 		}
 		

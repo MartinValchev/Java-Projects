@@ -2,6 +2,10 @@ package campaignProject;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,6 +15,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
@@ -26,20 +32,42 @@ public class DatePicker {
 	private static JPanel datesPanel;
 	private JDatePanelImpl datePanelOne;
 	private JDatePickerImpl datePickerOne ;
+	boolean changed;
+	private SqlDateModel modelOne;
+	DateLabelFormatter dateFormater;
 	Date selectedDate;
 	public DatePicker() {
 		
 		datesPanel = new JPanel();
 		//date one adding
-		SqlDateModel modelOne = new SqlDateModel();
+		modelOne = new SqlDateModel();
 		Properties p = new Properties();
 		p.put("text.today", "Today");
 		p.put("text.month", "Month");
 		p.put("text.year", "Year");
 		datePanelOne = new JDatePanelImpl(modelOne, p);
-		DateLabelFormatter dateFormater = new DateLabelFormatter();
-		datePickerOne = new JDatePickerImpl(datePanelOne, dateFormater);
-		datesPanel.add(datePickerOne);
+		
+		dateFormater = new DateLabelFormatter();
+		datePickerOne = new JDatePickerImpl(datePanelOne, dateFormater); 
+		changed = false;
+		datePickerOne.getModel().addChangeListener(new ChangeListener(){
+			
+			 @Override
+			   public void stateChanged(ChangeEvent arg0) {
+			    if (datePickerOne.getModel().getValue() == null) {
+			    changed = false;
+			       return;
+			    }
+			    if (!changed) {
+			     System.out.println(datePickerOne.getModel().getValue());
+			     datePickerOne.getModel().setValue(null);
+			     changed = true;
+			    }
+			    
+			   }
+		});
+		
+		datesPanel.add(datePickerOne); 
 		
 		
 	}
@@ -48,14 +76,15 @@ public class DatePicker {
 		return selectedDate;
 	}
 	public JPanel getDatesPanel(){
+		return datesPanel;
+	}
+
+	public JDatePickerImpl getDatePickerOne(){
 		return datePickerOne;
 	}
-	public Object getDatePickerOne(){
-		return datePickerOne;
-	}
-	public static void main(String[] args) {
+	public void generateGUI() {
 		dateFrame = new JFrame("General Settings");
-		dateFrame.setSize(450, 100);
+		dateFrame.setSize(350, 100);
 		dateFrame.setResizable(false);
 		dateFrame.setLocation(410, 0);
 		dateFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,12 +93,6 @@ public class DatePicker {
 		dateFrame.add(datesPanel);
 		DatePicker del = new DatePicker();
 		dateFrame.setVisible(true); 
-		//DatePicker.DateLabelFormatter formatter = datePicker.new DateLabelFormatter();
-		//Date selected = datePicker.getSelectedDate();
-		//Calendar call = Calendar.getInstance();
-		//call.setTime(selected);
-		//DatePicker.DateLabelFormatter formatter = datePicker.new DateLabelFormatter();
-		//System.out.println(formatter.valueToString(call));
 	}
 	public String getDateValue(){
 		Date selected = getSelectedDate();
