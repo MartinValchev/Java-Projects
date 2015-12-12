@@ -23,37 +23,43 @@ public class GeneralSettingsData {
 	private TestValidInput checkInput;
 	private SettingsCommandBuffer commandBuffer;
 	private String errorMessage = "impressions field does not contain valid number";
-	private DatabaseConnection databaseConnection;
-	private int[] maxImpressions;
-	private String[] positionName;
-	private ArrayList<Integer> impressionsList;
-	private ArrayList<String> positionList;
 	private String separator = "-";
-	private String[] positionArr;
-	private int[] impressionsArr;
 	private ArrayList<PositionTableRecord> addList;
 	private ArrayList<PositionTableRecord> removeList;
 	private ArrayList<PositionTableRecord> posList;
 	private PositionManipulator positionManipulator;
+	private PositionCash positionCash;
 
 	public GeneralSettingsData() throws SQLException {
 		checkInput = new TestValidInput();
 		commandBuffer = new SettingsCommandBuffer();
-		databaseConnection = new DatabaseConnection();
 		addList = new ArrayList<PositionTableRecord>();
 		removeList = new ArrayList<PositionTableRecord>();
 		positionManipulator = new PositionManipulator();
 		posList = new ArrayList<PositionTableRecord>();
-		posList = databaseConnection.pullFromPositionTable();
+		positionCash = new PositionCash();
+		posList = positionCash.getPositionList();
 	}
 
-	public boolean validateInput(String inputToCheck) {
-		if (checkInput.checkSettingsInput(inputToCheck)) {
+	public boolean validateInput(String impressions) {
+		int number;
+		try {
+			number = Integer.parseInt(impressions);
 			return true;
-		} else {
+		} catch (Exception e) {
 			return false;
 		}
 
+	}
+
+	public boolean compareRecords(DefaultListModel<PositionTableRecord> listModel, PositionTableRecord record) {
+		boolean isFound = false;
+		for (int i = 0; i < listModel.size(); i++) {
+			if (listModel.getElementAt(i).getPositionName().equals(record.getPositionName())) {
+				isFound = true;
+			}
+		}
+		return isFound;
 	}
 
 	public void sortCommandList(ArrayList<PositionTableRecord> currentCommandsList,
@@ -89,20 +95,20 @@ public class GeneralSettingsData {
 
 	}
 
-	public void compareLists(ArrayList<PositionTableRecord> newCommandsList) {
+	public void compareLists(ArrayList<PositionTableRecord> newCommandsList) throws ClassNotFoundException {
 		sortCommandList(posList, newCommandsList);
 		if (addList.size() > 0) {
-			commandBuffer.callAddSettingsCommands(addList);
+			positionCash.addToPositionCash(addList);
 		}
 		if (removeList.size() > 0) {
-			commandBuffer.callRemoveSettingsCommands(positionArr, impressionsArr);
+			positionCash.removeFromPositionCash(removeList);
 		}
 
 	}
 
-	public void fillListModel(DefaultListModel<String> listModel) {
+	public void fillListModel(DefaultListModel<PositionTableRecord> listModel) {
 		for (int i = 0; i < posList.size(); i++) {
-			String currentElement = posList.get(i).getPostionRecord();
+			PositionTableRecord currentElement = posList.get(i);
 			listModel.addElement(currentElement);
 		}
 	}

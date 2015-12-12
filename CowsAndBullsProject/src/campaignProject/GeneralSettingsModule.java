@@ -1,17 +1,21 @@
 package campaignProject;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -26,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
@@ -39,8 +44,8 @@ public class GeneralSettingsModule {
 	private DataModule websiteModule;
 	private DataModule positionModule;
 	private JLabel windowNameLabel;
-	private JList list;
-	private DefaultListModel listModel;
+	private JList<PositionTableRecord> list;
+	private DefaultListModel<PositionTableRecord> listModel;
 	private static final String removeString = "Del";
 	private static final String addString = "Add";
 	private JButton removeButton;
@@ -48,15 +53,12 @@ public class GeneralSettingsModule {
 	private JTextField impressionsField;
 	private JTextField positionsField;
 	private JLabel separator;
-	private String[] positionStrings;
 	private StringBuilder builder;
-	private ArrayList<String> currentSettingsList;
-	private ArrayList<String> newSettingsList;
 	private String numberFormatErrorMessage = "Impressions field does not contain valid number";
 	private String alreadyInListErrorMessage = "The position you are trying to enter is already in the List";
-	private String positionRecord;
+	private PositionTableRecord positionRecord;
 	private GeneralSettingsData settingsData;
-	private static final String DELIMITER = " - ";
+	private static final char DELIMITER = '-';
 
 	public GeneralSettingsModule() throws SQLException {
 		settingsFrame = new JFrame("General Settings");
@@ -83,10 +85,6 @@ public class GeneralSettingsModule {
 		settingsFrame.setVisible(true);
 	}
 
-	public String getPositionRecord() {
-		return positionRecord;
-	}
-
 	public DefaultListModel getListModel() {
 		return listModel;
 	}
@@ -98,9 +96,11 @@ public class GeneralSettingsModule {
 
 	public JPanel createPositionPanel() {
 		JPanel positionPanel = new JPanel();
-		listModel = new DefaultListModel();
+		listModel = new DefaultListModel<PositionTableRecord>();
 		settingsData.fillListModel(listModel);
 		list = new JList<>(listModel);
+		list.setCellRenderer(new PositionRenderer());
+		list.setOpaque(true);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
 		// list.addListSelectionListener(new AddListener);
@@ -117,21 +117,42 @@ public class GeneralSettingsModule {
 		AddListener addListener = new AddListener(addButton);
 		addButton.setActionCommand(addString);
 		addButton.addActionListener(addListener);
-		addButton.setEnabled(false);
+		addButton.setEnabled(true);
 		//
 		removeButton = new JButton(removeString);
 		removeButton.setActionCommand(removeString);
 		removeButton.addActionListener(new RemoveListener());
 		//
 		impressionsField = new JTextField(7);
-		impressionsField.setText("Impress max");
-		impressionsField.addActionListener(addListener);
-		impressionsField.getDocument().addDocumentListener(addListener);
+		impressionsField.setToolTipText("Impress max");
+		impressionsField.requestFocus();
 		positionsField = new JTextField(12);
-		positionsField.getDocument().addDocumentListener(addListener);
-		positionsField.setText("Position Name");
+		positionsField.setToolTipText("Position Name");
+		positionsField.addFocusListener(new FocusListener() {
 
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				if (impressionsField.getText().equals("")) {
+					JOptionPane.showMessageDialog(null, "Impressions not entered", "Settings input error",
+							JOptionPane.ERROR_MESSAGE, null);
+					impressionsField.requestFocus();
+				}
+				if (!settingsData.validateInput(impressionsField.getText())) {
+					JOptionPane.showMessageDialog(null, numberFormatErrorMessage, "Settings input error",
+							JOptionPane.ERROR_MESSAGE, null);
+				}
+
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
 		//
+
 		separator = new JLabel(" - ");
 		//
 		JPanel buttonPane = new JPanel();
@@ -151,16 +172,7 @@ public class GeneralSettingsModule {
 
 	}
 
-	public ArrayList<String> getListArray() {
-		ArrayList<String> arrList = new ArrayList<String>();
-		for (int i = 0; i < listModel.size(); i++) {
-			arrList.add((String) listModel.getElementAt(i));
-		}
-
-		return arrList;
-	}
-
-	public class AddListener implements ActionListener, DocumentListener {
+	public class AddListener implements ActionListener {
 		protected boolean alreadyEnabled = false;
 		private JButton button;
 
@@ -170,13 +182,20 @@ public class GeneralSettingsModule {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
-			builder.append(impressionsField.getText());
+			if (positionsField.getText().equals("")) {
+				JOptionPane.showMessageDialog(null, "Position not entered", "Settings input error",
+						JOptionPane.ERROR_MESSAGE, null);
+				positionsField.requestFocus();
+				return;
+			}
+			String positionName = positionsField.getText().trim();
+			int impressions = Integer.parseInt(impressionsField.getText());
+			positionRecord = new PositionTableRecord(positionName, impressions);
+			builder.append(impressions);
 			builder.append(DELIMITER);
-			builder.append(positionsField.getText());
-			positionRecord = builder.toString();
+			builder.append(positionName);
 			// User didn't type in a unique name...
-			if (positionRecord.equals("") || alreadyInList(positionRecord)) {
+			if (settingsData.compareRecords(listModel, positionRecord)) {
 				JOptionPane.showMessageDialog(null, alreadyInListErrorMessage, "Settings input error",
 						JOptionPane.ERROR_MESSAGE, null);
 				positionsField.requestFocusInWindow();
@@ -184,23 +203,13 @@ public class GeneralSettingsModule {
 				return;
 			}
 
-			if (settingsData.validateInput(positionRecord)) {
-				listModel.addElement(positionRecord);
-				builder.append(DELIMITER);
-				positionsField.setText("");
-				impressionsField.setText("");
-				
-			} else {
-				JOptionPane.showMessageDialog(null, numberFormatErrorMessage, "Settings input error",
-						JOptionPane.ERROR_MESSAGE, null);
-				impressionsField.setText("");
-				builder.setLength(0);
-			}
-			builder.setLength(0);
+			listModel.addElement(new PositionTableRecord(positionName, impressions));
+			positionsField.setText("");
+			impressionsField.setText("");
 
 		}
 
-		protected boolean alreadyInList(String name) {
+		protected boolean alreadyInList(PositionTableRecord name) {
 			return listModel.contains(name);
 		}
 
@@ -289,13 +298,48 @@ public class GeneralSettingsModule {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			ArrayList<PositionTableRecord> records = Collections.list(listModel.elements());
+			try {
+				settingsData.compareLists(records);
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
-			newSettingsList = getListArray();
-			settingsData.compareLists(currentSettingsList, newSettingsList);
 			// close window
 			settingsFrame.setVisible(false);
 			settingsFrame = null;
 
 		}
+	}
+
+	public class ImpressionsListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println(impressionsField.getText());
+
+		}
+
+	}
+
+	public class PositionRenderer extends JTextField implements ListCellRenderer<PositionTableRecord> {
+
+		@Override
+		public Component getListCellRendererComponent(JList<? extends PositionTableRecord> list,
+				PositionTableRecord record, int index, boolean isSelected, boolean cellHasFocus) {
+			String positionRecord = record.getPostionRecord();
+			setText(positionRecord);
+			setEditable(false);
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+			return this;
+		}
+
 	}
 }

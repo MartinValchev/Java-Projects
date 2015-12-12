@@ -3,6 +3,7 @@ package campaignProject;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -54,9 +55,10 @@ public class CampaignPosModule extends JPanel implements ListSelectionListener {
 	private JPanel positionDatesPanel;
 	private JPanel positionStartDatePanel;
 	private JPanel positionEndDatePanel;
+	private JPanel buttonPane;
 	private static final char DELIMITER = '-';
 	private String errorMessage = "Please fill all the fields prior to submitting the record";
-	private DatabaseConnection databaseConnection;
+	private PositionTableConnection databaseConnection;
 	
 	public CampaignPosModule() {
 		super(new BorderLayout());
@@ -65,7 +67,7 @@ public class CampaignPosModule extends JPanel implements ListSelectionListener {
 		// listModel.addElement("4000 - Position 2");
 		// listModel.addElement("3000 - Position 3");
 		// listModel.addElement("5000 - Position 4");
-		databaseConnection = new DatabaseConnection();
+		databaseConnection = new PositionTableConnection();
 		list = new JList(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSelectedIndex(0);
@@ -74,7 +76,7 @@ public class CampaignPosModule extends JPanel implements ListSelectionListener {
 		///////////////////////
 		JScrollPane listScrollPane = new JScrollPane(list);
 		positionDatesPanel = new JPanel();
-		positionDatesPanel.setLayout(new GridLayout(2, 2));
+		positionDatesPanel.setLayout(new GridLayout(2,2));
 		startDateLabel = new JLabel("Position Start Date");
 		endDateLabel = new JLabel("Position End Date");
 		posStartDatePicker = new DatePicker();
@@ -107,23 +109,27 @@ public class CampaignPosModule extends JPanel implements ListSelectionListener {
 		//
 		impressionsField = new JTextField(12);
 		impressionsField.setText("daily impressions");
-		impressionsField.addActionListener(addListener);
-		impressionsField.getDocument().addDocumentListener(addListener);
+		//impressionsField.addActionListener(addListener);
+		//impressionsField.getDocument().addDocumentListener(addListener);
 		//e
-		JPanel buttonPane = new JPanel();
-		buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+		buttonPane = new JPanel();
+		buttonPane.setLayout(new FlowLayout());
 		buttonPane.add(removeButton);
-		buttonPane.add(Box.createHorizontalStrut(5));
+		buttonPane.add(Box.createVerticalStrut(5));
 		buttonPane.add(new JSeparator(SwingConstants.VERTICAL));
-		buttonPane.add(Box.createHorizontalStrut(5));
+		buttonPane.add(Box.createVerticalStrut(5));
 		buttonPane.add(impressionsField);
 		buttonPane.add(positionList);
 		buttonPane.add(addButton);
-		buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		//buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		add(positionDatesPanel, BorderLayout.NORTH);
 		add(buttonPane, BorderLayout.CENTER);
 		add(listScrollPane, BorderLayout.SOUTH);
-
+       // delete when ready
+		//add(positionDatesPanel);
+	}
+	public JPanel getCampPositionModule(){
+		return buttonPane;
 	}
 
 	// !needs rework
